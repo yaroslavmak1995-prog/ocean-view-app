@@ -6,7 +6,7 @@ import useSWR from 'swr';
 import type { AnalysisResult, BarAnalysis, SRResult, APIResponse } from '../lib/types';
 import { getDemoScenarios } from '../lib/nonuple';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://ocean-view-api.railway.app';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://ocean-view-api-production.up.railway.app';
 const CACHE_KEY = '/api/v1/analyze';
 
 interface AnalysisData {

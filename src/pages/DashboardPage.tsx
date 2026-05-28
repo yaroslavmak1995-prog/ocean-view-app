@@ -73,6 +73,11 @@ export function DashboardPage() {
                 Demo Mode
               </span>
             )}
+            {!isDemo && !analysisError && (
+              <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded-full border border-emerald-500/30">
+                Live Data
+              </span>
+            )}
             {warning && (
               <span className="text-xs text-gray-500">{warning}</span>
             )}

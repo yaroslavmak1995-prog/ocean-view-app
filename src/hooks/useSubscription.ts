@@ -1,8 +1,9 @@
 // Ocean View — useSubscription Hook
-// Handles email capture with 3-level fallback (Formspree → mailto → localStorage)
+// Handles email capture with 4-level fallback (API → Formspree → mailto → localStorage)
 
 import { useState, useCallback } from 'react';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'https://ocean-view-api-production.up.railway.app';
 const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xpwzgkdl';
 const STORAGE_KEY = 'ov_subscribers';
 
@@ -68,6 +69,23 @@ export function useSubscription() {
     setState(prev => ({ ...prev, status: 'submitting', errorMessage: '' }));
 
     try {
+      // Level 0: Try our API backend
+      const apiRes = await fetch(`${API_BASE}/api/v1/subscribe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: emailToUse,
+          source: 'landing-react',
+          interest: 'early-access',
+        }),
+      });
+
+      if (apiRes.ok) {
+        saveLocally(emailToUse);
+        setState({ email: '', status: 'success', errorMessage: '' });
+        return { success: true, message: 'Subscribed successfully!' };
+      }
+
       // Level 1: Try Formspree
       const res = await fetch(FORMSPREE_ENDPOINT, {
         method: 'POST',
