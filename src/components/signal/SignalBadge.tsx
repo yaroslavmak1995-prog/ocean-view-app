@@ -9,11 +9,15 @@ interface SignalBadgeProps {
 export function SignalBadge({ analysis }: SignalBadgeProps) {
   const colorMap: Record<string, { bg: string; text: string; border: string; emoji: string }> = {
     green: { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30', emoji: '🟢' },
+    light_green: { bg: 'bg-emerald-500/20', text: 'text-emerald-400', border: 'border-emerald-500/30', emoji: '🟢' },
+    strong_green: { bg: 'bg-emerald-600/30', text: 'text-emerald-300', border: 'border-emerald-500/40', emoji: '🟢' },
     yellow: { bg: 'bg-amber-500/20', text: 'text-amber-400', border: 'border-amber-500/30', emoji: '🟡' },
     red: { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30', emoji: '🔴' },
+    light_red: { bg: 'bg-red-500/20', text: 'text-red-400', border: 'border-red-500/30', emoji: '🔴' },
+    strong_red: { bg: 'bg-red-600/30', text: 'text-red-300', border: 'border-red-500/40', emoji: '🔴' },
   };
 
-  const style = colorMap[analysis.zone_color];
+  const style = colorMap[analysis.zone_color] || colorMap.yellow;
 
   return (
     <div className={`${style.bg} ${style.border} border rounded-lg px-4 py-3`}>

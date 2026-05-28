@@ -4,15 +4,8 @@
 // ─── Core Types ───────────────────────────────────────────────
 
 export type TrendDirection = 'uptrend' | 'downtrend' | 'neutral';
-export type ZoneColor = 'green' | 'yellow' | 'red';
-export type SignalType =
-  | 'Strong Uptrend ↑'
-  | 'Moderate Uptrend ↗'
-  | 'Weak Uptrend ⬆'
-  | 'Neutral →'
-  | 'Weak Downtrend ⬇'
-  | 'Moderate Downtrend ↘'
-  | 'Strong Downtrend ↓';
+export type ZoneColor = 'green' | 'yellow' | 'red' | 'light_green' | 'light_red' | 'strong_green' | 'strong_red';
+export type SignalType = string;
 
 // ─── Indicator Details ────────────────────────────────────────
 

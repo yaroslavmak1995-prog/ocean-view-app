@@ -359,17 +359,22 @@ function getDefaultAnalysis(): AnalysisResult {
 // ─── Factor Breakdown ──────────────────────────────────────────
 
 export function getFactorBreakdown(analysis: AnalysisResult): FactorResult[] {
-  const d = analysis.details;
+  const d = analysis.details as any;
+  if (!d) return [];
+
+  // Helper to safely access numeric values
+  const num = (v: any, fallback: number = 0): number => typeof v === 'number' ? v : fallback;
+
   return [
-    { name: 'MA Crossover', value: `${d.ma_fast} / ${d.ma_slow}`, signal: d.ma_fast > d.ma_slow ? 'Bullish' : 'Bearish', bonus: d.ma_fast > d.ma_slow ? 20 : -20, aligned: (d.ma_fast > d.ma_slow) === (analysis.trend === 'uptrend') },
-    { name: 'Volume', value: '1.5x avg', signal: 'Confirmed', bonus: 15, aligned: true },
-    { name: 'Momentum', value: `${d.rsi}`, signal: d.rsi > 50 ? 'Bullish' : 'Bearish', bonus: d.rsi > 50 ? 5 : -5, aligned: (d.rsi > 50) === (analysis.trend === 'uptrend') },
-    { name: 'RSI', value: `${d.rsi}`, signal: d.rsi_signal, bonus: d.rsi > 70 ? -10 : d.rsi < 30 ? 15 : 5, aligned: (d.rsi > 30 && d.rsi < 70) },
-    { name: 'ADX', value: `${d.adx}`, signal: d.adx_direction, bonus: d.adx > 25 ? (d.adx_direction === 'Bullish' ? 25 : -15) : -5, aligned: d.adx_direction === (analysis.trend === 'uptrend' ? 'Bullish' : 'Bearish') },
-    { name: 'MACD', value: `${d.macd_line}`, signal: d.macd_crossover, bonus: d.macd_crossover === 'bullish' ? 10 : d.macd_crossover === 'bearish' ? -10 : 0, aligned: d.macd_crossover === (analysis.trend === 'uptrend' ? 'bullish' : 'bearish') },
-    { name: 'ATR', value: `${d.atr}`, signal: d.atr_volatility, bonus: d.atr_bonus, aligned: d.atr_bonus >= 0 },
-    { name: 'Bollinger Bands', value: `${(d.bb_percent_b * 100).toFixed(1)}%`, signal: d.bb_position, bonus: d.bb_bonus, aligned: d.bb_bonus > 0 },
-    { name: 'Stochastic', value: `K:${d.stoch_k} D:${d.stoch_d}`, signal: d.stoch_signal, bonus: d.stoch_bonus, aligned: d.stoch_bonus > 0 },
+    { name: 'MA Crossover', value: d.ma_fast != null ? `${num(d.ma_fast).toFixed(0)} / ${num(d.ma_slow).toFixed(0)}` : '—', signal: d.ma_fast > d.ma_slow ? 'Bullish' : 'Bearish', bonus: d.ma_fast > d.ma_slow ? 20 : -20, aligned: (d.ma_fast > d.ma_slow) === (analysis.trend === 'uptrend') },
+    { name: 'Volume', value: d.volume_ratio ? `${d.volume_ratio}x avg` : '—', signal: d.volume_ratio > 1.5 ? 'Confirmed' : 'Normal', bonus: 15, aligned: true },
+    { name: 'Momentum', value: d.momentum_pct != null ? `${d.momentum_pct}%` : `${num(d.rsi).toFixed(1)}`, signal: d.rsi > 50 ? 'Bullish' : 'Bearish', bonus: num(d.rsi) > 50 ? 5 : -5, aligned: (num(d.rsi) > 50) === (analysis.trend === 'uptrend') },
+    { name: 'RSI', value: `${num(d.rsi).toFixed(1)}`, signal: d.rsi_signal || (num(d.rsi) > 70 ? 'Overbought' : num(d.rsi) < 30 ? 'Oversold' : 'Neutral'), bonus: num(d.rsi) > 70 ? -10 : num(d.rsi) < 30 ? 15 : 5, aligned: num(d.rsi) > 30 && num(d.rsi) < 70 },
+    { name: 'ADX', value: `${num(d.adx).toFixed(1)}`, signal: d.adx_direction || 'Neutral', bonus: num(d.adx) > 25 ? (d.adx_direction === 'Bullish' || d.adx_direction === 'bullish' ? 25 : -15) : -5, aligned: d.adx_direction === (analysis.trend === 'uptrend' ? 'Bullish' : 'Bearish') },
+    { name: 'MACD', value: d.macd_crossover || 'none', signal: d.macd_crossover || 'none', bonus: d.macd_crossover === 'bullish' || d.macd_crossover === 'Bullish' ? 10 : d.macd_crossover === 'bearish' || d.macd_crossover === 'Bearish' ? -10 : 0, aligned: (d.macd_crossover === 'bullish' || d.macd_crossover === 'Bullish') === (analysis.trend === 'uptrend') },
+    { name: 'ATR', value: `${num(d.atr).toFixed(0)}`, signal: d.atr_volatility || 'normal', bonus: num(d.atr_bonus, 0), aligned: num(d.atr_bonus, 0) >= 0 },
+    { name: 'Bollinger Bands', value: d.bb_percent_b != null ? `${(num(d.bb_percent_b, 0.5) * 100).toFixed(1)}%` : '—', signal: d.bb_position || 'normal', bonus: num(d.bb_bonus, 0), aligned: num(d.bb_bonus, 0) > 0 },
+    { name: 'Stochastic', value: d.stoch_k != null ? `K:${num(d.stoch_k).toFixed(1)} D:${num(d.stoch_d).toFixed(1)}` : '—', signal: d.stoch_signal || 'neutral', bonus: num(d.stoch_bonus, 0), aligned: num(d.stoch_bonus, 0) > 0 },
   ];
 }
 

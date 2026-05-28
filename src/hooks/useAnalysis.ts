@@ -28,24 +28,108 @@ async function fetcher<T>(url: string): Promise<T> {
 
 // Transform API response to our format
 function transformAPIResponse(data: any): AnalysisData {
+  // Normalize zone_color: API may return light_green, strong_green, etc.
+  const normalizeZoneColor = (zc: string): string => {
+    if (!zc) return 'yellow';
+    if (zc.includes('green')) return 'green';
+    if (zc.includes('red')) return 'red';
+    return zc; // yellow stays yellow
+  };
+
+  // Normalize trend: API may return UPTREND, DOWNTREND
+  const normalizeTrend = (t: string): string => {
+    if (!t) return 'neutral';
+    return t.toLowerCase();
+  };
+
+  // Map API ocean_metaphor (kept for future use)
+  const oceanMetaphor = data.ocean_metaphor || {};
+  void oceanMetaphor;
+
+  // Map API sr_levels to component format
+  const srLevels = data.sr_levels || {};
+  const mappedSR = {
+    levels: srLevels.levels || [],
+    nearest_support: srLevels.nearest_support || null,
+    nearest_resistance: srLevels.nearest_resistance || null,
+    support_zone: srLevels.support_zone || null,
+    resistance_zone: srLevels.resistance_zone || null,
+    current_position: (srLevels.position || 'between').replace('_', ' ') as any,
+  };
+
+  // Map factors to details
+  const factors = data.factors || [];
+  const factorMap: Record<string, any> = {};
+  for (const f of factors) {
+    factorMap[f.name] = f;
+  }
+
+  // Extract MACD details
+  const macdFactor = factorMap['MACD'] || {};
+  const bbFactor = factorMap['Bollinger Bands'] || {};
+  const stochFactor = factorMap['Stochastic'] || {};
+  const atrFactor = factorMap['ATR'] || {};
+  const rsiFactor = factorMap['RSI'] || {};
+  const adxFactor = factorMap['ADX'] || {};
+  const momFactor = factorMap['Momentum'] || {};
+  const volFactor = factorMap['Volume'] || {};
+  const maFactor = factorMap['MA Crossover'] || {};
+
+  // Parse MACD description
+  const macdMatch = (macdFactor.description || '').match(/MACD=([\-\d.]+),\s*Signal=([\-\d.]+),\s*Crossover=(\w+)/);
+  const bbMatch = (bbFactor.description || '').match(/%B=([\d.]+)%?,\s*Squeeze=(\w+),\s*Width=([\d.]+)/);
+  const stochMatch = (stochFactor.description || '').match(/%K=([\d.]+),\s*%D=([\d.]+),\s*Crossover=(\w+)/);
+  const rsiMatch = (rsiFactor.description || '').match(/RSI=([\d.]+)/);
+  const adxMatch = (adxFactor.description || '').match(/ADX=([\d.]+)\s*\((\w+)\),\s*(\w+)/);
+  const atrMatch = (atrFactor.description || '').match(/ATR=([\d.]+)\s*\((\w+)\),\s*Trend=(\w+)/);
+  const maMatch = (maFactor.description || '').match(/MA20=([\d.]+)\s*vs\s*MA50=([\d.]+)/);
+  const volMatch = (volFactor.description || '').match(/Volume ratio:\s*([\d.]+)x/);
+  // momMatch reserved for future momentum percentage parsing
+
+  // Build details from API factors
+  const details = {
+    ma_fast: maMatch ? parseFloat(maMatch[1]) : data.details?.ma_fast || 0,
+    ma_slow: maMatch ? parseFloat(maMatch[2]) : data.details?.ma_slow || 0,
+    rsi: rsiMatch ? parseFloat(rsiMatch[1]) : (data.details?.rsi || 50),
+    rsi_signal: rsiFactor.signal || 'neutral',
+    adx: adxMatch ? parseFloat(adxMatch[1]) : (data.details?.adx || 25),
+    adx_direction: adxMatch ? adxMatch[3] : (data.details?.adx_direction || 'neutral'),
+    macd_line: macdMatch ? parseFloat(macdMatch[1]) : (data.details?.macd_line || 0),
+    macd_signal: macdMatch ? parseFloat(macdMatch[2]) : (data.details?.macd_signal || 0),
+    macd_crossover: macdMatch ? macdMatch[3] : (data.details?.macd_crossover || 'none'),
+    atr: atrMatch ? parseFloat(atrMatch[1]) : (data.details?.atr || 0),
+    atr_volatility: atrMatch ? atrMatch[2].toLowerCase() : (data.details?.atr_volatility || 'normal'),
+    atr_trend: atrMatch ? atrMatch[3].toLowerCase() : (data.details?.atr_trend || 'stable'),
+    atr_bonus: atrFactor.bonus || 0,
+    atr_stop_suggestions: data.atr_stop_suggestions || data.details?.atr_stop_suggestions || {},
+    bb_upper: data.details?.bb_upper || 0,
+    bb_lower: data.details?.bb_lower || 0,
+    bb_percent_b: bbMatch ? parseFloat(bbMatch[1]) / 100 : (data.details?.bb_percent_b || 0.5),
+    bb_squeeze: bbMatch ? bbMatch[2].toLowerCase() : (data.details?.bb_squeeze || 'normal'),
+    bb_position: bbFactor.signal || 'normal',
+    bb_bonus: bbFactor.bonus || 0,
+    bb_bandwidth: bbMatch ? parseFloat(bbMatch[3]) : (data.details?.bb_bandwidth || 0),
+    volume_ratio: volMatch ? parseFloat(volMatch[1]) : (data.details?.volume_ratio || 1),
+    momentum_pct: data.details?.momentum_pct || (momFactor.value as number) || 0,
+    stoch_k: stochMatch ? parseFloat(stochMatch[1]) : (data.details?.stoch_k || 50),
+    stoch_d: stochMatch ? parseFloat(stochMatch[2]) : (data.details?.stoch_d || 50),
+    stoch_signal: stochFactor.signal || 'neutral',
+    stoch_crossover: stochMatch ? stochMatch[3] : (data.details?.stoch_crossover || 'none'),
+    stoch_bonus: stochFactor.bonus || 0,
+    synergy_bonus: data.synergy_bonus || data.details?.synergy_bonus || 0,
+  };
+
   return {
     analysis: {
-      trend: data.trend || 'neutral',
+      trend: normalizeTrend(data.trend) as any,
       strength: data.strength || 0,
-      zone_color: data.zone_color || 'yellow',
-      signal: data.signal || 'Neutral →',
+      zone_color: normalizeZoneColor(data.zone_color) as any,
+      signal: (data.signal || 'Neutral →') as any,
       confidence: data.confidence || 0,
-      details: data.details || {},
+      details,
     },
     bars: data.history || data.bars || [],
-    sr: data.support_resistance || data.sr || {
-      levels: [],
-      nearest_support: null,
-      nearest_resistance: null,
-      support_zone: null,
-      resistance_zone: null,
-      current_position: 'between',
-    },
+    sr: mappedSR as any,
     isDemo: data._synthetic || false,
     cached: data._cached || false,
     stale: data._stale || false,
