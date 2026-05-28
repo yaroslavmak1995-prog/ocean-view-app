@@ -9,7 +9,7 @@ interface FactorGridProps {
 
 export function FactorGrid({ factors }: FactorGridProps) {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2">
       {factors.map((factor, i) => (
         <div
           key={i}

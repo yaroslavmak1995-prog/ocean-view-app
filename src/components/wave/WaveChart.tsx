@@ -1,7 +1,7 @@
 // Ocean View — Wave Chart Component
-// SVG wave rendering with zone coloring
+// SVG wave rendering with zone coloring + responsive sizing
 
-import { useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import type { BarAnalysis } from '../../lib/types';
 
 interface WaveChartProps {
@@ -15,15 +15,36 @@ interface WaveChartProps {
 
 export function WaveChart({
   bars,
-  width = 800,
-  height = 300,
+  width,
+  height,
   showSR = true,
   supportLevel,
   resistanceLevel,
 }: WaveChartProps) {
-  const padding = { top: 20, right: 40, bottom: 40, left: 60 };
-  const chartW = width - padding.left - padding.right;
-  const chartH = height - padding.top - padding.bottom;
+  const [containerWidth, setContainerWidth] = useState(800);
+  const svgRef = useRef<HTMLDivElement>(null);
+
+  // Responsive: auto-size from container unless explicit width given
+  useEffect(() => {
+    if (width) return;
+    const update = () => {
+      if (svgRef.current) {
+        setContainerWidth(svgRef.current.clientWidth || 800);
+      }
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, [width]);
+
+  const actualWidth = width || containerWidth;
+  const actualHeight = height || (actualWidth < 500 ? 220 : 300);
+
+  const padding = actualWidth < 500
+    ? { top: 15, right: 20, bottom: 30, left: 45 }
+    : { top: 20, right: 40, bottom: 40, left: 60 };
+  const chartW = actualWidth - padding.left - padding.right;
+  const chartH = actualHeight - padding.top - padding.bottom;
 
   const { points, minY, maxY, zoneRects, srLines } = useMemo(() => {
     if (bars.length === 0) return { points: [], minY: 0, maxY: 0, zoneRects: [], srLines: [] };
@@ -82,7 +103,7 @@ export function WaveChart({
 
   if (bars.length === 0) {
     return (
-      <div className="flex items-center justify-center text-gray-500" style={{ width, height }}>
+      <div ref={svgRef} className="flex items-center justify-center text-gray-500 h-[220px] md:h-[300px]">
         Loading wave data...
       </div>
     );
@@ -111,100 +132,103 @@ export function WaveChart({
   };
 
   const strokeColor = zoneColorMap[lastBar.zone_color] || '#f59e0b';
+  const isMobile = actualWidth < 500;
 
   return (
-    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} className="w-full">
-      {/* Background */}
-      <rect x={0} y={0} width={width} height={height} fill="#0a0f1e" rx="12" />
+    <div ref={svgRef} className="w-full">
+      <svg width={actualWidth} height={actualHeight} viewBox={`0 0 ${actualWidth} ${actualHeight}`} className="w-full" preserveAspectRatio="xMidYMid meet">
+        {/* Background */}
+        <rect x={0} y={0} width={actualWidth} height={actualHeight} fill="#0a0f1e" rx="12" />
 
-      {/* Zone backgrounds */}
-      {zoneRects.map((z, i) => (
-        <rect
-          key={i}
-          x={z.x}
-          y={padding.top}
-          width={z.width}
-          height={chartH}
-          fill={zoneColorMap[z.color] || '#f59e0b'}
-          opacity={z.opacity}
-        />
-      ))}
+        {/* Zone backgrounds */}
+        {zoneRects.map((z, i) => (
+          <rect
+            key={i}
+            x={z.x}
+            y={padding.top}
+            width={z.width}
+            height={chartH}
+            fill={zoneColorMap[z.color] || '#f59e0b'}
+            opacity={z.opacity}
+          />
+        ))}
 
-      {/* Grid lines */}
-      {[0, 0.25, 0.5, 0.75, 1].map((frac, i) => {
-        const y = padding.top + frac * chartH;
-        const price = maxY - frac * (maxY - minY);
-        return (
-          <g key={i}>
-            <line x1={padding.left} y1={y} x2={padding.left + chartW} y2={y} stroke="#1e293b" strokeWidth={0.5} />
-            <text x={padding.left - 8} y={y + 4} textAnchor="end" fill="#64748b" fontSize={10}>
-              {price.toFixed(0)}
-            </text>
-          </g>
-        );
-      })}
+        {/* Grid lines */}
+        {[0, 0.25, 0.5, 0.75, 1].map((frac, i) => {
+          const y = padding.top + frac * chartH;
+          const price = maxY - frac * (maxY - minY);
+          return (
+            <g key={i}>
+              <line x1={padding.left} y1={y} x2={padding.left + chartW} y2={y} stroke="#1e293b" strokeWidth={0.5} />
+              <text x={padding.left - 8} y={y + 4} textAnchor="end" fill="#64748b" fontSize={isMobile ? 8 : 10}>
+                {price.toFixed(0)}
+              </text>
+            </g>
+          );
+        })}
 
-      {/* S/R Lines */}
-      {showSR &&
-        srLines.map((sr, i) => (
-          <g key={i}>
-            <line
-              x1={padding.left}
-              y1={sr.y}
-              x2={padding.left + chartW}
-              y2={sr.y}
-              stroke={sr.type === 'support' ? '#10b981' : '#ef4444'}
-              strokeWidth={1}
-              strokeDasharray="6 4"
-              opacity={0.6}
-            />
+        {/* S/R Lines */}
+        {showSR &&
+          srLines.map((sr, i) => (
+            <g key={i}>
+              <line
+                x1={padding.left}
+                y1={sr.y}
+                x2={padding.left + chartW}
+                y2={sr.y}
+                stroke={sr.type === 'support' ? '#10b981' : '#ef4444'}
+                strokeWidth={1}
+                strokeDasharray="6 4"
+                opacity={0.6}
+              />
+              <text
+                x={padding.left + chartW + 5}
+                y={sr.y + 4}
+                fill={sr.type === 'support' ? '#10b981' : '#ef4444'}
+                fontSize={isMobile ? 7 : 9}
+                opacity={0.8}
+              >
+                {sr.type === 'support' ? 'S' : 'R'} {sr.price.toFixed(0)}
+              </text>
+            </g>
+          ))}
+
+        {/* Wave area fill */}
+        <path d={areaD} fill={strokeColor} opacity={0.1} />
+
+        {/* Wave line with glow */}
+        <path d={pathD} fill="none" stroke={strokeColor} strokeWidth={2.5} opacity={0.3} />
+        <path d={pathD} fill="none" stroke={strokeColor} strokeWidth={1.5} />
+
+        {/* Current price pulse */}
+        {lastPoint && (
+          <g>
+            <circle cx={lastPoint.x} cy={lastPoint.y} r={8} fill={strokeColor} opacity={0.2}>
+              <animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite" />
+              <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite" />
+            </circle>
+            <circle cx={lastPoint.x} cy={lastPoint.y} r={4} fill={strokeColor} />
             <text
-              x={padding.left + chartW + 5}
-              y={sr.y + 4}
-              fill={sr.type === 'support' ? '#10b981' : '#ef4444'}
-              fontSize={9}
-              opacity={0.8}
+              x={lastPoint.x + 12}
+              y={lastPoint.y + 4}
+              fill={strokeColor}
+              fontSize={isMobile ? 9 : 11}
+              fontWeight="bold"
             >
-              {sr.type === 'support' ? 'S' : 'R'} {sr.price.toFixed(0)}
+              {lastBar.close.toLocaleString()}
             </text>
           </g>
-        ))}
+        )}
 
-      {/* Wave area fill */}
-      <path d={areaD} fill={strokeColor} opacity={0.1} />
-
-      {/* Wave line with glow */}
-      <path d={pathD} fill="none" stroke={strokeColor} strokeWidth={2.5} opacity={0.3} />
-      <path d={pathD} fill="none" stroke={strokeColor} strokeWidth={1.5} />
-
-      {/* Current price pulse */}
-      {lastPoint && (
-        <g>
-          <circle cx={lastPoint.x} cy={lastPoint.y} r={8} fill={strokeColor} opacity={0.2}>
-            <animate attributeName="r" values="6;12;6" dur="2s" repeatCount="indefinite" />
-            <animate attributeName="opacity" values="0.3;0.1;0.3" dur="2s" repeatCount="indefinite" />
-          </circle>
-          <circle cx={lastPoint.x} cy={lastPoint.y} r={4} fill={strokeColor} />
-          <text
-            x={lastPoint.x + 12}
-            y={lastPoint.y + 4}
-            fill={strokeColor}
-            fontSize={11}
-            fontWeight="bold"
-          >
-            {lastBar.close.toLocaleString()}
-          </text>
-        </g>
-      )}
-
-      {/* X-axis date labels */}
-      {points
-        .filter((_, i) => i % Math.ceil(points.length / 6) === 0)
-        .map((p, i) => (
-          <text key={i} x={p.x} y={height - 8} textAnchor="middle" fill="#64748b" fontSize={9}>
-            {p.bar.date.slice(5)}
-          </text>
-        ))}
-    </svg>
+        {/* X-axis date labels */}
+        {points
+          .filter((_, i) => i % Math.ceil(points.length / (isMobile ? 4 : 6)) === 0)
+          .map((p, i) => (
+            <text key={i} x={p.x} y={actualHeight - 8} textAnchor="middle" fill="#64748b" fontSize={isMobile ? 7 : 9}>
+              {p.bar.date.slice(5)}
+            </text>
+          ))}
+      </svg>
+    </div>
   );
 }

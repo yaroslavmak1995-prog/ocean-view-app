@@ -11,6 +11,7 @@ import { FactorGrid } from '../components/factors/FactorGrid';
 import { OceanMetaphor } from '../components/ocean/OceanMetaphor';
 import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 import { WaveChartSkeleton, SidebarSkeleton, FactorGridSkeleton } from '../components/ui/LoadingSkeleton';
+import { ShareAnalysis } from '../components/ui/ShareAnalysis';
 import { useAnalysis } from '../hooks/useAnalysis';
 import { useTicker } from '../hooks/useTicker';
 import { getFactorBreakdown, getOceanMetaphor } from '../lib/nonuple';
@@ -60,6 +61,7 @@ export function DashboardPage() {
         {/* Status bar */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
+            <a href="#" className="text-xs text-gray-500 hover:text-white transition-colors">← Home</a>
             <h1 className="text-lg font-semibold">{displayTicker}</h1>
             {analysisError && (
               <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded-full border border-red-500/30">
@@ -111,8 +113,6 @@ export function DashboardPage() {
                     bars={bars}
                     supportLevel={sr?.nearest_support}
                     resistanceLevel={sr?.nearest_resistance}
-                    width={760}
-                    height={350}
                   />
                 </div>
               )}
@@ -156,6 +156,9 @@ export function DashboardPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Share Analysis */}
+                <ShareAnalysis analysis={analysis} ticker={displayTicker} />
               </>
             )}
           </div>
@@ -181,9 +184,9 @@ export function DashboardPage() {
         </div>
 
         {/* Details Table */}
-        <div className="mt-4 bg-[#0a0f1e] rounded-xl p-4 border border-gray-800/50">
+        <div className="mt-4 bg-[#0a0f1e] rounded-xl p-3 sm:p-4 border border-gray-800/50">
           <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Indicator Details</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-3">
             <DetailItem label="MA Fast" value={analysis.details.ma_fast?.toLocaleString()} />
             <DetailItem label="MA Slow" value={analysis.details.ma_slow?.toLocaleString()} />
             <DetailItem label="RSI" value={analysis.details.rsi?.toFixed(1)} highlight={analysis.details.rsi > 70 || analysis.details.rsi < 30} />
