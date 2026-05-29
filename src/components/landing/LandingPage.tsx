@@ -154,6 +154,26 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* Pain Points */}
+      <section className="max-w-6xl mx-auto px-4 py-16">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">Sound Familiar?</h2>
+        <p className="text-gray-500 text-center mb-12">Every trader has been here.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {[
+            { emoji: '😵', title: 'Too Many Charts', desc: 'RSI here, MACD there, Bollinger over there... You switch between 5+ indicators and still aren\'t sure.' },
+            { emoji: '😰', title: 'Missed Signals', desc: 'You saw the RSI signal but missed the ADX divergence. By the time you connect the dots, the move is over.' },
+            { emoji: '🤯', title: 'Pattern Overload', desc: 'Doji, engulfing, hammer, morning star... 30+ candlestick patterns nobody can remember under pressure.' },
+            { emoji: '💸', title: 'Lost Money on Bad Reads', desc: 'You bought near resistance thinking it was support. Or sold in a dip that was actually a buying opportunity.' },
+          ].map((item, i) => (
+            <div key={i} className="p-5 bg-[#0a0f1e] rounded-xl border border-gray-800/50 hover:border-gray-700/50 transition-colors">
+              <div className="text-2xl mb-2">{item.emoji}</div>
+              <h3 className="text-sm font-semibold mb-1">{item.title}</h3>
+              <p className="text-xs text-gray-400">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* How It Works */}
       <section className="max-w-6xl mx-auto px-4 py-16">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">How It Works</h2>
@@ -170,6 +190,34 @@ export function LandingPage() {
               <p className="text-sm text-gray-400">{item.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Comparison */}
+      <section className="max-w-6xl mx-auto px-4 py-16">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">The Old Way vs. Ocean View</h2>
+        <p className="text-gray-500 text-center mb-12">One wave replaces the chaos.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-red-950/20 rounded-xl border border-red-500/20 p-6">
+            <h3 className="text-red-400 font-semibold mb-4">📉 The Old Way</h3>
+            <ul className="space-y-3 text-sm text-gray-400">
+              <li className="flex items-start gap-2"><span className="text-red-400">✗</span> Check 9 separate indicators</li>
+              <li className="flex items-start gap-2"><span className="text-red-400">✗</span> Memorize 30+ candlestick patterns</li>
+              <li className="flex items-start gap-2"><span className="text-red-400">✗</span> 2+ minutes per decision</li>
+              <li className="flex items-start gap-2"><span className="text-red-400">✗</span> Conflicting signals everywhere</li>
+              <li className="flex items-start gap-2"><span className="text-red-400">✗</span> Emotional, reactive trading</li>
+            </ul>
+          </div>
+          <div className="bg-emerald-950/20 rounded-xl border border-emerald-500/20 p-6">
+            <h3 className="text-emerald-400 font-semibold mb-4">🌊 Ocean View</h3>
+            <ul className="space-y-3 text-sm text-gray-300">
+              <li className="flex items-start gap-2"><span className="text-emerald-400">✓</span> One wave = 9 indicators fused</li>
+              <li className="flex items-start gap-2"><span className="text-emerald-400">✓</span> No patterns to memorize</li>
+              <li className="flex items-start gap-2"><span className="text-emerald-400">✓</span> 2 seconds per decision</li>
+              <li className="flex items-start gap-2"><span className="text-emerald-400">✓</span> Clear, confident signals</li>
+              <li className="flex items-start gap-2"><span className="text-emerald-400">✓</span> Data-driven, calm trading</li>
+            </ul>
+          </div>
         </div>
       </section>
 

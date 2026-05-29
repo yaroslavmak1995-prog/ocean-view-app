@@ -1,5 +1,5 @@
 // Ocean View — Share Analysis Component
-// Share current analysis via clipboard or social media
+// Share current analysis via clipboard or social media (Twitter/X, Reddit)
 
 import { useState } from 'react';
 import type { AnalysisResult } from '../../lib/types';
@@ -42,6 +42,12 @@ https://yaroslavmak1995-prog.github.io/ocean-view-app/`;
     window.open(url, '_blank');
   };
 
+  const handleReddit = () => {
+    const title = `Ocean View: ${ticker} ${zoneEmoji} ${trendArrow} — ${analysis.signal?.split(' - ')[0] || 'Analysis'}`;
+    const url = `https://www.reddit.com/submit?title=${encodeURIComponent(title)}&text=${encodeURIComponent(shareText)}`;
+    window.open(url, '_blank');
+  };
+
   return (
     <div className="bg-[#0a0f1e] rounded-xl p-3 border border-gray-800/50">
       <h3 className="text-xs text-gray-500 uppercase tracking-wider mb-2">Share Analysis</h3>
@@ -57,6 +63,12 @@ https://yaroslavmak1995-prog.github.io/ocean-view-app/`;
           className="flex-1 px-3 py-1.5 text-xs bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 rounded-lg border border-blue-500/30 transition-colors"
         >
           𝕏 Share
+        </button>
+        <button
+          onClick={handleReddit}
+          className="flex-1 px-3 py-1.5 text-xs bg-orange-600/20 hover:bg-orange-600/30 text-orange-400 rounded-lg border border-orange-500/30 transition-colors"
+        >
+          Reddit
         </button>
       </div>
     </div>

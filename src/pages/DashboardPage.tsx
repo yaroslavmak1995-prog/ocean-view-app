@@ -69,8 +69,8 @@ export function DashboardPage() {
               </span>
             )}
             {isDemo && !analysisError && (
-              <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs rounded-full border border-amber-500/30">
-                Demo Mode
+              <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-xs rounded-full border border-amber-500/30" title="You are viewing synthetic demo data. Real-time data available when backend is connected.">
+                ⚠ Demo Mode
               </span>
             )}
             {!isDemo && !analysisError && (
@@ -209,6 +209,22 @@ export function DashboardPage() {
         {/* Disclaimer */}
         <div className="mt-6 text-center text-xs text-gray-600">
           Ocean View is for informational purposes only. Not financial advice. Past performance does not guarantee future results.
+        </div>
+
+        {/* Mobile Sticky CTA — visible on small screens only */}
+        <div className="fixed bottom-0 left-0 right-0 lg:hidden bg-[#0a0f1e]/95 backdrop-blur-sm border-t border-gray-800/50 px-4 py-3 z-50">
+          <div className="flex items-center gap-2">
+            <div className="flex-1">
+              <p className="text-xs text-gray-400">{isDemo ? 'Demo data — ' : 'Live — '}{displayTicker} {analysis.trend === 'uptrend' ? '🟢' : analysis.trend === 'downtrend' ? '🔴' : '🟡'} {analysis.signal?.split(' - ')[0] || 'Loading...'}</p>
+            </div>
+            <a
+              href="#"
+              onClick={(e) => { e.preventDefault(); navigator.clipboard.writeText(window.location.href); }}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 rounded-lg text-xs font-semibold transition-colors whitespace-nowrap"
+            >
+              Share ↗
+            </a>
+          </div>
         </div>
       </main>
 
