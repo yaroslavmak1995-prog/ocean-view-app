@@ -40,6 +40,11 @@ export function DashboardPage() {
 
   const [autoRefresh, setAutoRefresh] = useState(true);
 
+  // Price display
+  const priceDisplay = analysis?.price ? `${analysis.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—';
+  const changeDisplay = analysis?.change_24h != null ? `${analysis.change_24h > 0 ? '+' : ''}${analysis.change_24h.toFixed(2)}%` : '';
+  const changeColor = analysis?.change_24h != null ? (analysis.change_24h > 0 ? 'text-emerald-400' : analysis.change_24h < 0 ? 'text-red-400' : 'text-gray-400') : 'text-gray-400';
+
   // Auto-refresh every 60 seconds
   useEffect(() => {
     if (!autoRefresh) return;
@@ -63,6 +68,12 @@ export function DashboardPage() {
           <div className="flex items-center gap-3">
             <a href="#" className="text-xs text-gray-500 hover:text-white transition-colors">← Home</a>
             <h1 className="text-lg font-semibold">{displayTicker}</h1>
+            {analysis?.price && (
+              <span className="text-sm font-mono text-gray-300">${priceDisplay}</span>
+            )}
+            {changeDisplay && (
+              <span className={`text-xs font-mono ${changeColor}`}>{changeDisplay}</span>
+            )}
             {analysisError && (
               <span className="px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded-full border border-red-500/30">
                 API Error

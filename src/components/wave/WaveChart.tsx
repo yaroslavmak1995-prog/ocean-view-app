@@ -135,7 +135,11 @@ export function WaveChart({
   const isMobile = actualWidth < 500;
 
   return (
-    <div ref={svgRef} className="w-full">
+    <div ref={svgRef} className="w-full relative">
+      {/* Demo Watermark */}
+      <div className="absolute top-2 right-3 z-10 px-2 py-0.5 bg-amber-500/15 border border-amber-500/30 rounded text-[9px] text-amber-400 pointer-events-none select-none">
+        DEMO
+      </div>
       <svg width={actualWidth} height={actualHeight} viewBox={`0 0 ${actualWidth} ${actualHeight}`} className="w-full" preserveAspectRatio="xMidYMid meet">
         {/* Background */}
         <rect x={0} y={0} width={actualWidth} height={actualHeight} fill="#0a0f1e" rx="12" />

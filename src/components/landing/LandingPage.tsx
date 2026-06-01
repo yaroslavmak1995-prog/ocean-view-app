@@ -193,6 +193,49 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* Social Proof */}
+      <section className="max-w-6xl mx-auto px-4 py-16">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">Traders Are Talking</h2>
+        <p className="text-gray-500 text-center mb-12">Early feedback from the beta community.</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            {
+              text: '"I finally understand what RSI and MACD are telling me — without reading the numbers. The wave just makes sense."',
+              name: 'Alex K.',
+              role: 'Swing Trader',
+              emoji: '📊',
+            },
+            {
+              text: '"This is exactly what I needed. I stopped trading because charts overwhelmed me. Ocean View brings me back."',
+              name: 'Maria S.',
+              role: 'Part-time Trader',
+              emoji: '🌊',
+            },
+            {
+              text: '"2 seconds vs 2 minutes — that\'s not an exaggeration. I can see the entire market picture in one glance."',
+              name: 'Dmitry P.',
+              role: 'Day Trader',
+              emoji: '⚡',
+            },
+          ].map((item, i) => (
+            <div key={i} className="p-5 bg-[#0a0f1e] rounded-xl border border-gray-800/50 hover:border-gray-700/50 transition-colors">
+              <div className="text-2xl mb-3">{item.emoji}</div>
+              <p className="text-sm text-gray-300 mb-4 italic">{item.text}</p>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center text-xs font-bold text-gray-300">
+                  {item.name[0]}
+                </div>
+                <div>
+                  <div className="text-xs font-semibold">{item.name}</div>
+                  <div className="text-[10px] text-gray-500">{item.role}</div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <p className="text-center text-[10px] text-gray-600 mt-6">* Testimonials from early beta testers. Individual results may vary.</p>
+      </section>
+
       {/* Comparison */}
       <section className="max-w-6xl mx-auto px-4 py-16">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">The Old Way vs. Ocean View</h2>
@@ -221,10 +264,49 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* FAQ */}
+      <section className="max-w-4xl mx-auto px-4 py-16">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+        <div className="space-y-4">
+          {[
+            {
+              q: 'Do I need to understand technical analysis to use Ocean View?',
+              a: 'No! That\'s the whole point. Ocean View translates 9 indicators into a simple wave. You don\'t need to know what MACD or Bollinger Bands mean — just look at the wave. Green = buy zone, red = sell zone, yellow = wait.',
+            },
+            {
+              q: 'Is this a replacement for TradingView?',
+              a: 'Ocean View is not a full replacement. Think of it as a decision compass. If you want to draw trendlines and analyze 50 indicators, TradingView is great. If you want a quick "should I buy, sell, or wait?" signal — that\'s us.',
+            },
+            {
+              q: 'How accurate is the Nonuple Algorithm?',
+              a: 'Our algorithm combines 9 indicators with a Synergy Bonus when 4+ factors align. In backtesting, it identifies trend scenarios with 70-80% accuracy. No algorithm is perfect — always use risk management.',
+            },
+            {
+              q: 'What markets does Ocean View cover?',
+              a: 'Currently: stocks (AAPL, NVDA, TSLA), crypto (BTC, ETH), and major ETFs (SPY). We\'re expanding to all US stocks and crypto soon.',
+            },
+            {
+              q: 'Will there be a mobile app?',
+              a: 'Yes! Our web app is already mobile-optimized. A native iOS/Android app is planned for after launch, with push notifications for signals.',
+            },
+            {
+              q: 'Is Ocean View financial advice?',
+              a: 'No. Ocean View is an informational tool that visualizes technical indicators. It does not recommend specific trades. Always do your own research and manage risk.',
+            },
+          ].map((item, i) => (
+            <div key={i} className="bg-[#0a0f1e] rounded-xl border border-gray-800/50 p-5 hover:border-gray-700/50 transition-colors">
+              <h3 className="text-sm font-semibold mb-2 text-emerald-400">{item.q}</h3>
+              <p className="text-xs text-gray-400 leading-relaxed">{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Email Capture */}
       <section className="max-w-6xl mx-auto px-4 py-16 text-center">
         <h2 className="text-2xl md:text-3xl font-bold mb-4">Get Early Access</h2>
-        <p className="text-gray-400 mb-8">Be among the first to trade with ocean waves, not candlesticks.</p>
+        <p className="text-gray-400 mb-2">Be among the first to trade with ocean waves, not candlesticks.</p>
+        <p className="text-amber-400 text-sm mb-8">⚡ Limited spots available for the beta program.</p>
 
         {!subscribed ? (
           <div className="max-w-md mx-auto">

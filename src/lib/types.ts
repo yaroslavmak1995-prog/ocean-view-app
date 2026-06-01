@@ -83,6 +83,9 @@ export interface AnalysisResult {
   zone_color: ZoneColor;
   signal: SignalType;
   confidence: number;       // 0-100
+  price?: number;           // current price from API
+  change_24h?: number;     // 24h % change from API
+  signal_text?: string;    // Ukrainian signal text from API
   details: AnalysisDetails;
 }
 
