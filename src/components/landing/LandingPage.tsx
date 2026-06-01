@@ -43,7 +43,11 @@ export function LandingPage() {
       return;
     }
 
-    // Try Formspree, fallback to mailto
+    // Save to localStorage immediately
+    stored.push(email.toLowerCase());
+    localStorage.setItem('ov_subscribers', JSON.stringify(stored));
+
+    // Try Formspree first (if configured), then mailto fallback
     const formspreeEndpoint = 'https://formspree.io/f/xpwzgkdl';
 
     fetch(formspreeEndpoint, {
@@ -54,16 +58,14 @@ export function LandingPage() {
       .then(res => {
         if (res.ok) {
           setSubscribed(true);
-          stored.push(email.toLowerCase());
-          localStorage.setItem('ov_subscribers', JSON.stringify(stored));
         } else {
-          // Fallback: mailto
+          // Formspree not configured — open mailto
           window.location.href = `mailto:oceanview.trading@gmail.com?subject=Early%20Access%20Request&body=Hi%2C%20I%27d%20like%20early%20access%20to%20Ocean%20View.%20My%20email%3A%20${encodeURIComponent(email)}`;
           setSubscribed(true);
         }
       })
       .catch(() => {
-        // Fallback: mailto
+        // Network error — open mailto
         window.location.href = `mailto:oceanview.trading@gmail.com?subject=Early%20Access%20Request&body=Hi%2C%20I%27d%20like%20early%20access%20to%20Ocean%20View.%20My%20email%3A%20${encodeURIComponent(email)}`;
         setSubscribed(true);
       });
@@ -283,7 +285,7 @@ export function LandingPage() {
             },
             {
               q: 'What markets does Ocean View cover?',
-              a: 'Currently: stocks (AAPL, NVDA, TSLA), crypto (BTC, ETH), and major ETFs (SPY). We\'re expanding to all US stocks and crypto soon.',
+              a: 'Currently: crypto (BTC, ETH), top stocks (AAPL, NVDA, TSLA, AMZN, META, GOOG), and major ETFs (SPY). We\'re expanding to all US stocks and more crypto soon.',
             },
             {
               q: 'Will there be a mobile app?',

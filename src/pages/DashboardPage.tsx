@@ -22,6 +22,9 @@ const TICKER_LIST = [
   { symbol: 'AAPL', label: 'AAPL' },
   { symbol: 'NVDA', label: 'NVDA' },
   { symbol: 'TSLA', label: 'TSLA' },
+  { symbol: 'AMZN', label: 'AMZN' },
+  { symbol: 'META', label: 'META' },
+  { symbol: 'GOOG', label: 'GOOG' },
   { symbol: 'SPY', label: 'SPY' },
 ];
 
