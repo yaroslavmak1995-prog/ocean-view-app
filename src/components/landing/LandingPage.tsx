@@ -1,5 +1,6 @@
-// Ocean View — Landing Page Component (React version)
+// Ocean View — Landing Page Component (React version) v5
 // Portable from standalone-landing.html
+// Day 42: Market Pulse, FAQ Accordion, useSubscription hook, expanded ticker coverage
 
 import { useState, useEffect, useCallback } from 'react';
 import type { DemoScenario } from '../../lib/types';
@@ -9,13 +10,44 @@ import { ConfidenceMeter } from '../signal/ConfidenceMeter';
 import { FactorGrid } from '../factors/FactorGrid';
 import { OceanMetaphor } from '../ocean/OceanMetaphor';
 import { getDemoScenarios, getFactorBreakdown, getOceanMetaphor } from '../../lib/nonuple';
+import { useSubscription } from '../../hooks/useSubscription';
+import { useSubscriberCount } from '../../hooks/useSubscriberCount';
+import { useMarketPulse } from '../../hooks/useMarketPulse';
+
+// FAQ Accordion Component
+function FAQAccordion({ items }: { items: { q: string; a: string }[] }) {
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  return (
+    <div className="space-y-3">
+      {items.map((item, i) => (
+        <div key={i} className="bg-[#0a0f1e] rounded-xl border border-gray-800/50 overflow-hidden transition-colors hover:border-gray-700/50">
+          <button
+            onClick={() => setOpenIndex(openIndex === i ? null : i)}
+            className="w-full flex items-center justify-between p-5 text-left"
+          >
+            <h3 className="text-sm font-semibold text-emerald-400 pr-4">{item.q}</h3>
+            <span className={`text-gray-500 transition-transform duration-200 ${openIndex === i ? 'rotate-180' : ''}`}>
+              ▼
+            </span>
+          </button>
+          {openIndex === i && (
+            <div className="px-5 pb-5">
+              <p className="text-sm text-gray-400 leading-relaxed">{item.a}</p>
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function LandingPage() {
   const scenarios: DemoScenario[] = getDemoScenarios();
   const [activeScenario, setActiveScenario] = useState(0);
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-  const [emailError, setEmailError] = useState('');
+  const { email, setEmail, subscribe, isSubscribed, errorMessage } = useSubscription();
+  const { count: subscriberCount } = useSubscriberCount();
+  const { data: pulseData } = useMarketPulse();
 
   // Auto-rotate scenarios
   useEffect(() => {
@@ -30,46 +62,8 @@ export function LandingPage() {
   const metaphor = getOceanMetaphor(scenario.analysis);
 
   const handleSubscribe = useCallback(() => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setEmailError('Please enter a valid email address');
-      return;
-    }
-
-    // Check localStorage for duplicate
-    const stored = JSON.parse(localStorage.getItem('ov_subscribers') || '[]');
-    if (stored.includes(email.toLowerCase())) {
-      setEmailError('This email is already registered!');
-      return;
-    }
-
-    // Save to localStorage immediately
-    stored.push(email.toLowerCase());
-    localStorage.setItem('ov_subscribers', JSON.stringify(stored));
-
-    // Try Formspree first (if configured), then mailto fallback
-    const formspreeEndpoint = 'https://formspree.io/f/xpwzgkdl';
-
-    fetch(formspreeEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, source: 'landing-react', interest: 'early-access' }),
-    })
-      .then(res => {
-        if (res.ok) {
-          setSubscribed(true);
-        } else {
-          // Formspree not configured — open mailto
-          window.location.href = `mailto:oceanview.trading@gmail.com?subject=Early%20Access%20Request&body=Hi%2C%20I%27d%20like%20early%20access%20to%20Ocean%20View.%20My%20email%3A%20${encodeURIComponent(email)}`;
-          setSubscribed(true);
-        }
-      })
-      .catch(() => {
-        // Network error — open mailto
-        window.location.href = `mailto:oceanview.trading@gmail.com?subject=Early%20Access%20Request&body=Hi%2C%20I%27d%20like%20early%20access%20to%20Ocean%20View.%20My%20email%3A%20${encodeURIComponent(email)}`;
-        setSubscribed(true);
-      });
-  }, [email]);
+    subscribe();
+  }, [subscribe]);
 
   return (
     <div className="min-h-screen bg-[#060b18] text-white">
@@ -195,6 +189,91 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* Market Pulse — Live Data */}
+      <section className="max-w-6xl mx-auto px-4 py-16">
+        <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">Live Market Pulse</h2>
+        <p className="text-gray-500 text-center mb-8">Real-time analysis from the Nonuple Algorithm.</p>
+
+        {/* Live Data Cards — Top 5 */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-4">
+          {pulseData.length > 0 ? pulseData.map((item) => {
+            const zoneColors: Record<string, string> = {
+              green: 'border-emerald-500/30 bg-emerald-500/5',
+              light_green: 'border-emerald-500/30 bg-emerald-500/5',
+              strong_green: 'border-emerald-500/30 bg-emerald-500/5',
+              yellow: 'border-amber-500/30 bg-amber-500/5',
+              red: 'border-red-500/30 bg-red-500/5',
+              light_red: 'border-red-500/30 bg-red-500/5',
+              strong_red: 'border-red-500/30 bg-red-500/5',
+            };
+            const trendEmoji: Record<string, string> = { uptrend: '🟢', downtrend: '🔴', neutral: '🟡' };
+            const borderClass = zoneColors[item.zone_color] || zoneColors.yellow;
+            const trend = item.trend || 'neutral';
+            const isUp = trend === 'uptrend';
+            const isDown = trend === 'downtrend';
+
+            return (
+              <a
+                key={item.symbol}
+                href="#dashboard"
+                className={`rounded-xl border p-3 text-center hover:scale-105 transition-all group ${borderClass}`}
+              >
+                <div className="text-lg mb-1">{trendEmoji[trend] || '🟡'}</div>
+                <div className="text-xs font-semibold group-hover:text-emerald-400 transition-colors">{item.label}</div>
+                {item.price !== null ? (
+                  <>
+                    <div className="text-sm font-mono text-gray-300">
+                      ${item.price > 1000 ? item.price.toLocaleString(undefined, { maximumFractionDigits: 0 }) : item.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    </div>
+                    {item.change !== null && (
+                      <div className={`text-[10px] font-mono ${isUp ? 'text-emerald-400' : isDown ? 'text-red-400' : 'text-gray-500'}`}>
+                        {isUp ? '+' : ''}{item.change.toFixed(2)}%
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-[10px] text-gray-600 mt-1">Loading...</div>
+                )}
+              </a>
+            );
+          }) : (
+            <>
+              {[
+                { symbol: 'BTC', name: 'Bitcoin', emoji: '🪙' },
+                { symbol: 'ETH', name: 'Ethereum', emoji: '💎' },
+                { symbol: 'AAPL', name: 'Apple', emoji: '🍎' },
+                { symbol: 'NVDA', name: 'NVIDIA', emoji: '🟢' },
+                { symbol: 'SPY', name: 'S&P 500', emoji: '📊' },
+              ].map((item) => (
+                <div key={item.symbol} className="bg-[#0a0f1e] rounded-xl border border-gray-800/50 p-3 text-center">
+                  <div className="text-lg mb-1">{item.emoji}</div>
+                  <div className="text-xs font-semibold">{item.symbol}</div>
+                  <div className="text-[10px] text-gray-600">{item.name}</div>
+                  <div className="text-[10px] text-gray-600 mt-1">Loading...</div>
+                </div>
+              ))}
+            </>
+          )}
+        </div>
+
+        {/* Remaining tickers — compact */}
+        <div className="flex flex-wrap justify-center gap-2 mb-4">
+          {['SOL', 'DOGE', 'ADA', 'MSFT', 'TSLA', 'GOOGL', 'AMZN', 'META', 'QQQ', 'IWM'].map((s) => (
+            <a
+              key={s}
+              href="#dashboard"
+              className="bg-[#0a0f1e] rounded-lg border border-gray-800/50 px-2.5 py-1 text-[11px] font-medium text-gray-400 hover:border-emerald-500/30 hover:text-emerald-400 transition-all"
+            >
+              {s}
+            </a>
+          ))}
+        </div>
+
+        <p className="text-center text-xs text-gray-600">
+          🌊 Try the <a href="#dashboard" className="text-emerald-400 hover:text-emerald-300 underline">Live Dashboard</a> for full analysis of 15+ assets
+        </p>
+      </section>
+
       {/* Social Proof */}
       <section className="max-w-6xl mx-auto px-4 py-16">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-4">Traders Are Talking</h2>
@@ -266,57 +345,56 @@ export function LandingPage() {
         </div>
       </section>
 
-      {/* FAQ */}
+      {/* FAQ — Interactive Accordion */}
       <section className="max-w-4xl mx-auto px-4 py-16">
         <h2 className="text-2xl md:text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-        <div className="space-y-4">
-          {[
-            {
-              q: 'Do I need to understand technical analysis to use Ocean View?',
-              a: 'No! That\'s the whole point. Ocean View translates 9 indicators into a simple wave. You don\'t need to know what MACD or Bollinger Bands mean — just look at the wave. Green = buy zone, red = sell zone, yellow = wait.',
-            },
-            {
-              q: 'Is this a replacement for TradingView?',
-              a: 'Ocean View is not a full replacement. Think of it as a decision compass. If you want to draw trendlines and analyze 50 indicators, TradingView is great. If you want a quick "should I buy, sell, or wait?" signal — that\'s us.',
-            },
-            {
-              q: 'How accurate is the Nonuple Algorithm?',
-              a: 'Our algorithm combines 9 indicators with a Synergy Bonus when 4+ factors align. In backtesting, it identifies trend scenarios with 70-80% accuracy. No algorithm is perfect — always use risk management.',
-            },
-            {
-              q: 'What markets does Ocean View cover?',
-              a: 'Currently: crypto (BTC, ETH), top stocks (AAPL, NVDA, TSLA, AMZN, META, GOOG), and major ETFs (SPY). We\'re expanding to all US stocks and more crypto soon.',
-            },
-            {
-              q: 'Will there be a mobile app?',
-              a: 'Yes! Our web app is already mobile-optimized. A native iOS/Android app is planned for after launch, with push notifications for signals.',
-            },
-            {
-              q: 'Is Ocean View financial advice?',
-              a: 'No. Ocean View is an informational tool that visualizes technical indicators. It does not recommend specific trades. Always do your own research and manage risk.',
-            },
-          ].map((item, i) => (
-            <div key={i} className="bg-[#0a0f1e] rounded-xl border border-gray-800/50 p-5 hover:border-gray-700/50 transition-colors">
-              <h3 className="text-sm font-semibold mb-2 text-emerald-400">{item.q}</h3>
-              <p className="text-xs text-gray-400 leading-relaxed">{item.a}</p>
-            </div>
-          ))}
-        </div>
+        <FAQAccordion items={[
+          {
+            q: 'Do I need to understand technical analysis to use Ocean View?',
+            a: 'No! That\'s the whole point. Ocean View translates 9 indicators into a simple wave. You don\'t need to know what MACD or Bollinger Bands mean — just look at the wave. Green = buy zone, red = sell zone, yellow = wait.',
+          },
+          {
+            q: 'Is this a replacement for TradingView?',
+            a: 'Ocean View is not a full replacement. Think of it as a decision compass. If you want to draw trendlines and analyze 50 indicators, TradingView is great. If you want a quick "should I buy, sell, or wait?" signal — that\'s us.',
+          },
+          {
+            q: 'How accurate is the Nonuple Algorithm?',
+            a: 'Our algorithm combines 9 indicators with a Synergy Bonus when 4+ factors align. In backtesting, it identifies trend scenarios with 70-80% accuracy. No algorithm is perfect — always use risk management.',
+          },
+          {
+            q: 'What markets does Ocean View cover?',
+            a: 'Currently: crypto (BTC, ETH, SOL, DOGE, ADA), top US stocks (AAPL, MSFT, NVDA, TSLA, GOOGL, AMZN, META), and major ETFs (SPY, QQQ, IWM). We also track forex pairs (EUR/USD, GBP/USD). That\'s 17+ assets with live analysis.',
+          },
+          {
+            q: 'Will there be a mobile app?',
+            a: 'Yes! Our web app is already mobile-optimized with a sticky CTA and responsive design. A native iOS/Android app is planned for after launch, with push notifications for signals.',
+          },
+          {
+            q: 'Is Ocean View financial advice?',
+            a: 'No. Ocean View is an informational tool that visualizes technical indicators. It does not recommend specific trades. Always do your own research and manage risk.',
+          },
+        ]} />
       </section>
 
       {/* Email Capture */}
       <section className="max-w-6xl mx-auto px-4 py-16 text-center">
         <h2 className="text-2xl md:text-3xl font-bold mb-4">Get Early Access</h2>
         <p className="text-gray-400 mb-2">Be among the first to trade with ocean waves, not candlesticks.</p>
-        <p className="text-amber-400 text-sm mb-8">⚡ Limited spots available for the beta program.</p>
+        <p className="text-amber-400 text-sm mb-2">⚡ Limited spots available for the beta program.</p>
+        {subscriberCount !== null && subscriberCount > 0 && (
+          <p className="text-emerald-400/80 text-sm mb-8">🌊 Join {subscriberCount} trader{subscriberCount !== 1 ? 's' : ''} already riding the wave.</p>
+        )}
+        {subscriberCount === null && (
+          <p className="text-gray-500 text-xs mb-8">Be the first to get early access.</p>
+        )}
 
-        {!subscribed ? (
+        {!isSubscribed ? (
           <div className="max-w-md mx-auto">
             <div className="flex gap-2">
               <input
                 type="email"
                 value={email}
-                onChange={(e) => { setEmail(e.target.value); setEmailError(''); }}
+                onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSubscribe()}
                 placeholder="your@email.com"
                 className="flex-1 px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-sm focus:outline-none focus:border-emerald-500"
@@ -328,7 +406,7 @@ export function LandingPage() {
                 Join
               </button>
             </div>
-            {emailError && <p className="text-red-400 text-xs mt-2">{emailError}</p>}
+            {errorMessage && <p className="text-red-400 text-xs mt-2">{errorMessage}</p>}
             <p className="text-gray-600 text-xs mt-2">🔒 We never share your email with third parties.</p>
           </div>
         ) : (

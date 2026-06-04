@@ -17,15 +17,24 @@ import { useTicker } from '../hooks/useTicker';
 import { getFactorBreakdown, getOceanMetaphor } from '../lib/nonuple';
 
 const TICKER_LIST = [
-  { symbol: 'BTC-USD', label: 'BTC' },
-  { symbol: 'ETH-USD', label: 'ETH' },
-  { symbol: 'AAPL', label: 'AAPL' },
-  { symbol: 'NVDA', label: 'NVDA' },
-  { symbol: 'TSLA', label: 'TSLA' },
-  { symbol: 'AMZN', label: 'AMZN' },
-  { symbol: 'META', label: 'META' },
-  { symbol: 'GOOG', label: 'GOOG' },
-  { symbol: 'SPY', label: 'SPY' },
+  // Crypto
+  { symbol: 'BTC-USD', label: 'BTC', group: 'crypto' },
+  { symbol: 'ETH-USD', label: 'ETH', group: 'crypto' },
+  { symbol: 'SOL-USD', label: 'SOL', group: 'crypto' },
+  { symbol: 'DOGE-USD', label: 'DOGE', group: 'crypto' },
+  { symbol: 'ADA-USD', label: 'ADA', group: 'crypto' },
+  // Stocks
+  { symbol: 'AAPL', label: 'AAPL', group: 'stocks' },
+  { symbol: 'MSFT', label: 'MSFT', group: 'stocks' },
+  { symbol: 'NVDA', label: 'NVDA', group: 'stocks' },
+  { symbol: 'TSLA', label: 'TSLA', group: 'stocks' },
+  { symbol: 'GOOGL', label: 'GOOGL', group: 'stocks' },
+  { symbol: 'AMZN', label: 'AMZN', group: 'stocks' },
+  { symbol: 'META', label: 'META', group: 'stocks' },
+  // ETFs
+  { symbol: 'SPY', label: 'SPY', group: 'etfs' },
+  { symbol: 'QQQ', label: 'QQQ', group: 'etfs' },
+  { symbol: 'IWM', label: 'IWM', group: 'etfs' },
 ];
 
 export function DashboardPage() {
