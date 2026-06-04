@@ -12,8 +12,10 @@ import { OceanMetaphor } from '../components/ocean/OceanMetaphor';
 import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 import { WaveChartSkeleton, SidebarSkeleton, FactorGridSkeleton } from '../components/ui/LoadingSkeleton';
 import { ShareAnalysis } from '../components/ui/ShareAnalysis';
+import { MarketOverview } from '../components/dashboard/MarketOverview';
 import { useAnalysis } from '../hooks/useAnalysis';
 import { useTicker } from '../hooks/useTicker';
+import { useMarketOverview } from '../hooks/useMarketOverview';
 import { getFactorBreakdown, getOceanMetaphor } from '../lib/nonuple';
 
 const TICKER_LIST = [
@@ -40,6 +42,7 @@ const TICKER_LIST = [
 export function DashboardPage() {
   const { activeTicker, displayTicker, selectTicker } = useTicker('BTC-USD');
   const { analysis, bars, sr, isDemo, isLoading, error: analysisError, warning, refetch } = useAnalysis(activeTicker);
+  const marketOverview = useMarketOverview();
 
   const factors = getFactorBreakdown(analysis);
   const metaphor = getOceanMetaphor(analysis);
@@ -122,6 +125,18 @@ export function DashboardPage() {
               ↻ Refresh
             </button>
           </div>
+        </div>
+
+        {/* Market Overview */}
+        <div className="mb-4">
+          <MarketOverview
+            sectors={marketOverview.sectors}
+            trendingTickers={marketOverview.trendingTickers}
+            marketMood={marketOverview.marketMood}
+            lastUpdated={marketOverview.lastUpdated}
+            loading={marketOverview.loading}
+            onTickerClick={(symbol) => selectTicker(symbol)}
+          />
         </div>
 
         {/* Main content grid */}
