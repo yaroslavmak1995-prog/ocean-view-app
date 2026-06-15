@@ -31,11 +31,26 @@ export interface SectorSummary {
   dominantTrend: 'uptrend' | 'downtrend' | 'neutral';
 }
 
+export interface RiskRadar {
+  score: number;            // 0-100, where 0=risk-off, 50=neutral, 100=risk-on
+  label: 'Risk-On' | 'Risk-Off' | 'Neutral';
+  emoji: string;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+  description: string;
+  crossAssetDivergence: boolean;  // true when crypto & stocks diver
+  cryptoTrend: 'uptrend' | 'downtrend' | 'neutral';
+  stocksTrend: 'uptrend' | 'downtrend' | 'neutral';
+  etfsTrend: 'uptrend' | 'downtrend' | 'neutral';
+}
+
 export interface MarketOverviewData {
   tickers: TickerSnapshot[];
   sectors: SectorSummary[];
   marketMood: 'bullish' | 'bearish' | 'neutral';
   trendingTickers: TickerSnapshot[];  // highest confidence
+  riskRadar: RiskRadar;
   lastUpdated: Date | null;
 }
 
@@ -102,12 +117,106 @@ function computeMarketMood(sectors: SectorSummary[]): 'bullish' | 'bearish' | 'n
   return 'neutral';
 }
 
+function computeRiskRadar(sectors: SectorSummary[]): RiskRadar {
+  // Risk Radar: cross-asset risk score
+  // High risk-on = all sectors bullish (investors seeking risk)
+  // High risk-off = crypto bearish + stocks/ETFs mixed or bullish (money fleeing risky assets)
+  // Neutral = mixed signals
+
+  const crypto = sectors.find(s => s.group === 'crypto');
+  const stocks = sectors.find(s => s.group === 'stocks');
+  const etfs = sectors.find(s => s.group === 'etfs');
+
+  if (!crypto || !stocks || !etfs) {
+    return {
+      score: 50, label: 'Neutral', emoji: '🟡',
+      color: 'text-amber-400', bgColor: 'bg-amber-500/10', borderColor: 'border-amber-500/30',
+      description: 'Insufficient data for risk assessment.',
+      crossAssetDivergence: false,
+      cryptoTrend: 'neutral', stocksTrend: 'neutral', etfsTrend: 'neutral',
+    };
+  }
+
+  // Calculate risk score (0-100)
+  // Each sector contributes to the score based on its bullish/bearish ratio
+  const cryptoScore = crypto.bullish > crypto.bearish ? 70 + (crypto.avgConfidence * 0.3) : 30 - (crypto.avgConfidence * 0.2);
+  const stocksScore = stocks.bullish > stocks.bearish ? 65 + (stocks.avgConfidence * 0.3) : 35 - (stocks.avgConfidence * 0.2);
+  const etfsScore = etfs.bullish > etfs.bearish ? 60 + (etfs.avgConfidence * 0.3) : 40 - (etfs.avgConfidence * 0.2);
+
+  // Crypto divergence: when crypto is bearish but stocks/ETFs are bullish = risk-off
+  const crossAssetDivergence =
+    (crypto.dominantTrend === 'downtrend' && (stocks.dominantTrend === 'uptrend' || etfs.dominantTrend === 'uptrend')) ||
+    (crypto.dominantTrend === 'uptrend' && (stocks.dominantTrend === 'downtrend' || etfs.dominantTrend === 'downtrend'));
+
+  // Weighted average: crypto matters most for risk appetite
+  const rawScore = (cryptoScore * 0.4) + (stocksScore * 0.35) + (etfsScore * 0.25);
+  const score = Math.round(Math.max(0, Math.min(100, rawScore)));
+
+  // Divergence penalty: if crypto & stocks diverge, push toward risk-off
+  const divergencePenalty = crossAssetDivergence ? -15 : 0;
+  const finalScore = Math.round(Math.max(0, Math.min(100, score + divergencePenalty)));
+
+  let label: 'Risk-On' | 'Risk-Off' | 'Neutral';
+  let emoji: string;
+  let color: string;
+  let bgColor: string;
+  let borderColor: string;
+  let description: string;
+
+  if (finalScore >= 65) {
+    label = 'Risk-On';
+    emoji = '🟢';
+    color = 'text-emerald-400';
+    bgColor = 'bg-emerald-500/10';
+    borderColor = 'border-emerald-500/30';
+    description = 'Investors are seeking risk. Crypto & equities aligned in uptrend. Favorable for long positions.';
+  } else if (finalScore <= 35) {
+    label = 'Risk-Off';
+    emoji = '🔴';
+    color = 'text-red-400';
+    bgColor = 'bg-red-500/10';
+    borderColor = 'border-red-500/30';
+    if (crossAssetDivergence && crypto.dominantTrend === 'downtrend') {
+      description = 'Capital flowing from crypto to traditional markets. Risk-off divergence detected. Exercise caution with risk assets.';
+    } else {
+      description = 'Markets are risk-averse. Consider defensive positions and reduced exposure.';
+    }
+  } else {
+    label = 'Neutral';
+    emoji = '🟡';
+    color = 'text-amber-400';
+    bgColor = 'bg-amber-500/10';
+    borderColor = 'border-amber-500/30';
+    description = 'Mixed signals across asset classes. No strong risk appetite or aversion. Wait for clearer direction.';
+  }
+
+  return {
+    score: finalScore, label, emoji, color, bgColor, borderColor, description, crossAssetDivergence,
+    cryptoTrend: crypto.dominantTrend,
+    stocksTrend: stocks.dominantTrend,
+    etfsTrend: etfs.dominantTrend,
+  };
+}
+
 export function useMarketOverview() {
   const [data, setData] = useState<MarketOverviewData>({
     tickers: [],
     sectors: [],
     marketMood: 'neutral',
     trendingTickers: [],
+    riskRadar: {
+      score: 50,
+      label: 'Neutral',
+      emoji: '\u{1f7e1}',
+      color: 'text-amber-400',
+      bgColor: 'bg-amber-500/10',
+      borderColor: 'border-amber-500/30',
+      description: 'Loading risk assessment...',
+      crossAssetDivergence: false,
+      cryptoTrend: 'neutral',
+      stocksTrend: 'neutral',
+      etfsTrend: 'neutral',
+    },
     lastUpdated: null,
   });
   const [loading, setLoading] = useState(true);
@@ -160,11 +269,14 @@ export function useMarketOverview() {
         .sort((a, b) => b.confidence - a.confidence)
         .slice(0, 5);
 
+      const riskRadar = computeRiskRadar(sectors);
+
       setData({
         tickers,
         sectors,
         marketMood,
         trendingTickers,
+        riskRadar,
         lastUpdated: new Date(),
       });
       setError(null);

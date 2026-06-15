@@ -13,6 +13,7 @@ import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 import { WaveChartSkeleton, SidebarSkeleton, FactorGridSkeleton } from '../components/ui/LoadingSkeleton';
 import { ShareAnalysis } from '../components/ui/ShareAnalysis';
 import { MarketOverview } from '../components/dashboard/MarketOverview';
+import { RiskRadarCard } from '../components/dashboard/RiskRadar';
 import { useAnalysis } from '../hooks/useAnalysis';
 import { useTicker } from '../hooks/useTicker';
 import { useMarketOverview } from '../hooks/useMarketOverview';
@@ -127,16 +128,21 @@ export function DashboardPage() {
           </div>
         </div>
 
-        {/* Market Overview */}
-        <div className="mb-4">
-          <MarketOverview
-            sectors={marketOverview.sectors}
-            trendingTickers={marketOverview.trendingTickers}
-            marketMood={marketOverview.marketMood}
-            lastUpdated={marketOverview.lastUpdated}
-            loading={marketOverview.loading}
-            onTickerClick={(symbol) => selectTicker(symbol)}
-          />
+        {/* Market Overview + Risk Radar */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+          <div className="lg:col-span-2">
+            <MarketOverview
+              sectors={marketOverview.sectors}
+              trendingTickers={marketOverview.trendingTickers}
+              marketMood={marketOverview.marketMood}
+              lastUpdated={marketOverview.lastUpdated}
+              loading={marketOverview.loading}
+              onTickerClick={(symbol) => selectTicker(symbol)}
+            />
+          </div>
+          <div>
+            <RiskRadarCard riskRadar={marketOverview.riskRadar} />
+          </div>
         </div>
 
         {/* Main content grid */}
