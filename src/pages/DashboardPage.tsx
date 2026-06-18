@@ -12,6 +12,7 @@ import { OceanMetaphor } from '../components/ocean/OceanMetaphor';
 import { ErrorBoundary } from '../components/ui/ErrorBoundary';
 import { WaveChartSkeleton, SidebarSkeleton, FactorGridSkeleton } from '../components/ui/LoadingSkeleton';
 import { ShareAnalysis } from '../components/ui/ShareAnalysis';
+import { SetAlertButton } from '../components/ui/SetAlertButton';
 import { MarketOverview } from '../components/dashboard/MarketOverview';
 import { RiskRadarCard } from '../components/dashboard/RiskRadar';
 import { useAnalysis } from '../hooks/useAnalysis';
@@ -205,6 +206,9 @@ export function DashboardPage() {
                     </div>
                   </div>
                 )}
+
+                {/* Set Alert — email capture hook */}
+                <SetAlertButton ticker={displayTicker} trend={analysis.trend || 'neutral'} />
 
                 {/* Share Analysis */}
                 <ShareAnalysis analysis={analysis} ticker={displayTicker} />
