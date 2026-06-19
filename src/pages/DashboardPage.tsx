@@ -45,6 +45,7 @@ export function DashboardPage() {
   const { activeTicker, displayTicker, selectTicker } = useTicker('BTC-USD');
   const { analysis, bars, sr, isDemo, isLoading, error: analysisError, warning, refetch } = useAnalysis(activeTicker);
   const marketOverview = useMarketOverview();
+  const { failedTickers } = marketOverview;
 
   const factors = getFactorBreakdown(analysis);
   const metaphor = getOceanMetaphor(analysis);
@@ -128,6 +129,13 @@ export function DashboardPage() {
             </button>
           </div>
         </div>
+
+        {/* API Warning for failed tickers */}
+        {failedTickers && failedTickers.length > 0 && (
+          <div className="mb-4 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-amber-400 text-xs">
+            ⚠ {failedTickers.length} ticker(s) temporarily unavailable (Stocks/ETFs). Crypto data is live. Updating when data source recovers.
+          </div>
+        )}
 
         {/* Market Overview + Risk Radar */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">

@@ -221,9 +221,11 @@ export function useMarketOverview() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [failedTickers, setFailedTickers] = useState<string[]>([]);
 
   const fetchOverview = useCallback(async () => {
     try {
+      const failed: string[] = [];
       const promises = TICKER_CONFIG.map(async (t) => {
         try {
           const res = await fetch(`${API_BASE}/api/v1/analyze/${t.symbol}`);
@@ -241,9 +243,11 @@ export function useMarketOverview() {
               zone_color: d.zone_color ?? 'yellow',
               signal: d.signal ?? '',
             } as TickerSnapshot;
+          } else {
+            failed.push(t.symbol);
           }
         } catch {
-          // Silently fail for individual tickers
+          failed.push(t.symbol);
         }
         return {
           symbol: t.symbol,
@@ -279,7 +283,12 @@ export function useMarketOverview() {
         riskRadar,
         lastUpdated: new Date(),
       });
-      setError(null);
+      setFailedTickers(failed);
+      if (failed.length > 0) {
+        setError(`${failed.length} ticker(s) unavailable: ${failed.join(', ')}. Crypto data is live. Stocks/ETFs temporarily unavailable.`);
+      } else {
+        setError(null);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch market overview');
     } finally {
@@ -294,5 +303,5 @@ export function useMarketOverview() {
     return () => clearInterval(interval);
   }, [fetchOverview]);
 
-  return { ...data, loading, error, refetch: fetchOverview };
+  return { ...data, loading, error, failedTickers, refetch: fetchOverview };
 }
