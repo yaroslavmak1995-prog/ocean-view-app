@@ -27,6 +27,7 @@ async function fetcher<T>(url: string): Promise<T> {
 }
 
 // Transform API response to our format
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function transformAPIResponse(data: any): AnalysisData {
   // Normalize zone_color: API may return light_green, strong_green, etc.
   const normalizeZoneColor = (zc: string): string => {
@@ -54,11 +55,13 @@ function transformAPIResponse(data: any): AnalysisData {
     nearest_resistance: srLevels.nearest_resistance || null,
     support_zone: srLevels.support_zone || null,
     resistance_zone: srLevels.resistance_zone || null,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     current_position: (srLevels.position || 'between').replace('_', ' ') as any,
   };
 
   // Map factors to details
   const factors = data.factors || [];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const factorMap: Record<string, any> = {};
   for (const f of factors) {
     factorMap[f.name] = f;
@@ -76,7 +79,7 @@ function transformAPIResponse(data: any): AnalysisData {
   const maFactor = factorMap['MA Crossover'] || {};
 
   // Parse MACD description
-  const macdMatch = (macdFactor.description || '').match(/MACD=([\-\d.]+),\s*Signal=([\-\d.]+),\s*Crossover=(\w+)/);
+  const macdMatch = (macdFactor.description || '').match(/MACD=([-\d.]+),\s*Signal=([-\d.]+),\s*Crossover=(\w+)/);
   const bbMatch = (bbFactor.description || '').match(/%B=([\d.]+)%?,\s*Squeeze=(\w+),\s*Width=([\d.]+)/);
   const stochMatch = (stochFactor.description || '').match(/%K=([\d.]+),\s*%D=([\d.]+),\s*Crossover=(\w+)/);
   const rsiMatch = (rsiFactor.description || '').match(/RSI=([\d.]+)/);
@@ -121,9 +124,12 @@ function transformAPIResponse(data: any): AnalysisData {
 
   return {
     analysis: {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       trend: normalizeTrend(data.trend) as any,
       strength: data.strength || 0,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       zone_color: normalizeZoneColor(data.zone_color) as any,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       signal: (data.signal || 'Neutral →') as any,
       confidence: data.confidence || 0,
       price: data.price || undefined,
@@ -132,6 +138,7 @@ function transformAPIResponse(data: any): AnalysisData {
       details,
     },
     bars: data.history || data.bars || [],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sr: mappedSR as any,
     isDemo: data._synthetic || false,
     cached: data._cached || false,
@@ -158,6 +165,7 @@ function getDemoAnalysisData(ticker: string): AnalysisData {
 export function useAnalysis(ticker: string = 'BTC') {
   const url = `${API_BASE}${CACHE_KEY}/${ticker}`;
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error, isLoading, mutate } = useSWR<APIResponse<any>>(
     url,
     (url: string) => fetcher(url),
@@ -205,6 +213,7 @@ export function useAnalysis(ticker: string = 'BTC') {
 export function useHistory(ticker: string = 'BTC', period: string = '3mo', interval: string = '1d') {
   const url = `${API_BASE}/api/v1/history/${ticker}?period=${period}&interval=${interval}`;
   
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const { data, error, isLoading, mutate } = useSWR<APIResponse<any>>(
     url,
     (url: string) => fetcher(url),

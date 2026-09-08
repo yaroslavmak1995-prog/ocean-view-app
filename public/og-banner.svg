@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0a0e17"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </linearGradient>
+    <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06b6d4" stop-opacity="0.9"/>
+      <stop offset="50%" stop-color="#0891b2" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#6366f1" stop-opacity="0.5"/>
+    </linearGradient>
+    <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#08d9b2" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#3730a3" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+
+  <!-- Wave layers (decorative) -->
+  <path d="M0 380 Q200 320 400 380 T800 380 T1200 380 L1200 630 L0 630 Z" fill="url(#waveGrad1)"/>
+  <path d="M0 420 Q200 370 400 420 T800 420 T1200 420 L1200 630 L0 630 Z" fill="url(#waveGrad2)"/>
+
+  <!-- Glow dots (factor indicators) -->
+  <circle cx="200" cy="280" r="6" fill="#06b6d4" opacity="0.8"/>
+  <circle cx="280" cy="250" r="5" fill="#08d9b2" opacity="0.6"/>
+  <circle cx="350" cy="300" r="7" fill="#6366f1" opacity="0.7"/>
+  <circle cx="450" cy="270" r="5" fill="#f59e0b" opacity="0.5"/>
+  <circle cx="550" cy="290" r="6" fill="#10b981" opacity="0.6"/>
+  <circle cx="650" cy="260" r="5" fill="#ef4444" opacity="0.4"/>
+  <circle cx="750" cy="295" r="7" fill="#eab308" opacity="0.5"/>
+  <circle cx="850" cy="275" r="5" fill="#06b6d4" opacity="0.7"/>
+  <circle cx="950" cy="285" r="6" fill="#8b5cf6" opacity="0.6"/>
+
+  <!-- Title -->
+  <text x="600" y="160" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="bold" fill="#f8fafc">Ocean Wave</text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="215" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#94a3b8">9-in-1 Trend Visualizer</text>
+
+  <!-- Tagline -->
+  <text x="600" y="500" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="24" fill="#06b6d4" font-weight="500">Stop reading 9 indicators. Read the Ocean. 🌊</text>
+
+  <!-- Badge -->
+  <rect x="480" y="540" width="240" height="40" rx="20" fill="#1e293b" stroke="#06b6d4" stroke-width="1"/>
+  <text x="600" y="566" text-anchor="middle" font-family="system-ui, -apple-system, sans-serif" font-size="16" fill="#06b6d4">Free • Open Source • Pine Script v6</text>
+</svg>

@@ -211,9 +211,7 @@ export function analyzeMarket(bars: PriceBar[]): AnalysisResult {
 
   // 5. ADX
   const { adx, plusDI, minusDI } = calculateADX(highs, lows, closes);
-  let adxBonus = 0;
-  if (adx > 25) adxBonus = plusDI > minusDI ? 25 : -15;
-  else adxBonus = -5;
+  const adxBonus = adx > 25 ? (plusDI > minusDI ? 25 : -15) : -5;
 
   // 6. MACD
   const macd = calculateMACD(closes);
@@ -240,11 +238,7 @@ export function analyzeMarket(bars: PriceBar[]): AnalysisResult {
 
   // 9. Stochastic
   const stoch = calculateStochastic(highs, lows, closes);
-  let stochBonus = 0;
-  if (stoch.k > 80) stochBonus = -5; // Overbought
-  else if (stoch.k < 20) stochBonus = 5; // Oversold
-  else if (stoch.k > 50) stochBonus = 3;
-  else stochBonus = -3;
+  const stochBonus = stoch.k > 80 ? -5 : stoch.k < 20 ? 5 : stoch.k > 50 ? 3 : -3;
   const stochCrossover: 'bullish' | 'bearish' | 'none' = stoch.k > stoch.d ? 'bullish' : stoch.k < stoch.d ? 'bearish' : 'none';
 
   // Calculate total score
@@ -359,10 +353,12 @@ function getDefaultAnalysis(): AnalysisResult {
 // ─── Factor Breakdown ──────────────────────────────────────────
 
 export function getFactorBreakdown(analysis: AnalysisResult): FactorResult[] {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const d = analysis.details as any;
   if (!d) return [];
 
   // Helper to safely access numeric values
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const num = (v: any, fallback: number = 0): number => typeof v === 'number' ? v : fallback;
 
   return [

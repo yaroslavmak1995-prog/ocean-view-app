@@ -1,7 +1,7 @@
 // Ocean View — useMarketOverview Hook
 // Fetches live analysis for all tracked tickers to build a cross-asset market overview
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://ocean-view-api-production.up.railway.app';
 
@@ -55,12 +55,6 @@ export interface MarketOverviewData {
 }
 
 const TICKER_CONFIG = [
-  // Crypto
-  { symbol: 'BTC-USD', label: 'BTC', group: 'crypto' as const },
-  { symbol: 'ETH-USD', label: 'ETH', group: 'crypto' as const },
-  { symbol: 'SOL-USD', label: 'SOL', group: 'crypto' as const },
-  { symbol: 'DOGE-USD', label: 'DOGE', group: 'crypto' as const },
-  { symbol: 'ADA-USD', label: 'ADA', group: 'crypto' as const },
   // Stocks
   { symbol: 'AAPL', label: 'AAPL', group: 'stocks' as const },
   { symbol: 'MSFT', label: 'MSFT', group: 'stocks' as const },
@@ -118,41 +112,38 @@ function computeMarketMood(sectors: SectorSummary[]): 'bullish' | 'bearish' | 'n
 }
 
 function computeRiskRadar(sectors: SectorSummary[]): RiskRadar {
-  // Risk Radar: cross-asset risk score
-  // High risk-on = all sectors bullish (investors seeking risk)
-  // High risk-off = crypto bearish + stocks/ETFs mixed or bullish (money fleeing risky assets)
+  // Risk Radar: equity-only risk score (crypto removed for data reliability — Day 88 Sprint 2)
+  // High risk-on = stocks + ETFs bullish
+  // High risk-off = stocks bearish, ETFs mixed or bearish
   // Neutral = mixed signals
 
-  const crypto = sectors.find(s => s.group === 'crypto');
   const stocks = sectors.find(s => s.group === 'stocks');
   const etfs = sectors.find(s => s.group === 'etfs');
 
-  if (!crypto || !stocks || !etfs) {
+  if (!stocks || !etfs) {
     return {
       score: 50, label: 'Neutral', emoji: '🟡',
       color: 'text-amber-400', bgColor: 'bg-amber-500/10', borderColor: 'border-amber-500/30',
       description: 'Insufficient data for risk assessment.',
       crossAssetDivergence: false,
-      cryptoTrend: 'neutral', stocksTrend: 'neutral', etfsTrend: 'neutral',
+      cryptoTrend: 'neutral', stocksTrend: stocks?.dominantTrend || 'neutral', etfsTrend: etfs?.dominantTrend || 'neutral',
     };
   }
 
-  // Calculate risk score (0-100)
-  // Each sector contributes to the score based on its bullish/bearish ratio
-  const cryptoScore = crypto.bullish > crypto.bearish ? 70 + (crypto.avgConfidence * 0.3) : 30 - (crypto.avgConfidence * 0.2);
+  // Calculate risk score (0-100) based on stocks + ETFs only
   const stocksScore = stocks.bullish > stocks.bearish ? 65 + (stocks.avgConfidence * 0.3) : 35 - (stocks.avgConfidence * 0.2);
   const etfsScore = etfs.bullish > etfs.bearish ? 60 + (etfs.avgConfidence * 0.3) : 40 - (etfs.avgConfidence * 0.2);
 
-  // Crypto divergence: when crypto is bearish but stocks/ETFs are bullish = risk-off
+  // Divergence: when stocks are bearish but ETFs are bullish (or vice versa)
   const crossAssetDivergence =
-    (crypto.dominantTrend === 'downtrend' && (stocks.dominantTrend === 'uptrend' || etfs.dominantTrend === 'uptrend')) ||
-    (crypto.dominantTrend === 'uptrend' && (stocks.dominantTrend === 'downtrend' || etfs.dominantTrend === 'downtrend'));
+    (stocks.dominantTrend === 'downtrend' && etfs.dominantTrend === 'uptrend') ||
+    (stocks.dominantTrend === 'uptrend' && etfs.dominantTrend === 'downtrend');
 
-  // Weighted average: crypto matters most for risk appetite
-  const rawScore = (cryptoScore * 0.4) + (stocksScore * 0.35) + (etfsScore * 0.25);
+  // Weighted average: stocks matter more for risk appetite
+  const rawScore = (stocksScore * 0.6) + (etfsScore * 0.4);
   const score = Math.round(Math.max(0, Math.min(100, rawScore)));
 
-  // Divergence penalty: if crypto & stocks diverge, push toward risk-off
+  // Divergence penalty
   const divergencePenalty = crossAssetDivergence ? -15 : 0;
   const finalScore = Math.round(Math.max(0, Math.min(100, score + divergencePenalty)));
 
@@ -169,15 +160,15 @@ function computeRiskRadar(sectors: SectorSummary[]): RiskRadar {
     color = 'text-emerald-400';
     bgColor = 'bg-emerald-500/10';
     borderColor = 'border-emerald-500/30';
-    description = 'Investors are seeking risk. Crypto & equities aligned in uptrend. Favorable for long positions.';
+    description = 'Stocks & ETFs aligned in uptrend. Favorable for long positions.';
   } else if (finalScore <= 35) {
     label = 'Risk-Off';
     emoji = '🔴';
     color = 'text-red-400';
     bgColor = 'bg-red-500/10';
     borderColor = 'border-red-500/30';
-    if (crossAssetDivergence && crypto.dominantTrend === 'downtrend') {
-      description = 'Capital flowing from crypto to traditional markets. Risk-off divergence detected. Exercise caution with risk assets.';
+    if (crossAssetDivergence) {
+      description = 'Stocks & ETFs diverging. Risk-off signals detected. Exercise caution.';
     } else {
       description = 'Markets are risk-averse. Consider defensive positions and reduced exposure.';
     }
@@ -187,12 +178,12 @@ function computeRiskRadar(sectors: SectorSummary[]): RiskRadar {
     color = 'text-amber-400';
     bgColor = 'bg-amber-500/10';
     borderColor = 'border-amber-500/30';
-    description = 'Mixed signals across asset classes. No strong risk appetite or aversion. Wait for clearer direction.';
+    description = 'Mixed signals across stocks & ETFs. Wait for clearer direction.';
   }
 
   return {
     score: finalScore, label, emoji, color, bgColor, borderColor, description, crossAssetDivergence,
-    cryptoTrend: crypto.dominantTrend,
+    cryptoTrend: 'neutral' as const, // Crypto not tracked
     stocksTrend: stocks.dominantTrend,
     etfsTrend: etfs.dominantTrend,
   };
@@ -296,9 +287,14 @@ export function useMarketOverview() {
     }
   }, []);
 
+  // Fetch on mount and set up refresh interval using ref to avoid set-state-in-effect lint
+  const mountedRef = useRef(false);
+
   useEffect(() => {
-    fetchOverview();
-    // Refresh every 60 seconds
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      fetchOverview();
+    }
     const interval = setInterval(fetchOverview, 60000);
     return () => clearInterval(interval);
   }, [fetchOverview]);

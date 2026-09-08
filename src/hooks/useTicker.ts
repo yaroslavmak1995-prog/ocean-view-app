@@ -3,7 +3,7 @@
 
 import { useState, useCallback } from 'react';
 
-const DEFAULT_TICKERS = ['BTC-USD', 'ETH-USD', 'AAPL', 'NVDA', 'TSLA', 'SPY'];
+const DEFAULT_TICKERS = ['AAPL', 'NVDA', 'TSLA', 'SPY', 'GOOGL', 'META'];
 
 const STORAGE_KEY = 'ov_recent_tickers';
 

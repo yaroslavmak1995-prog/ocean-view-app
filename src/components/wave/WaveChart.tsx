@@ -40,9 +40,9 @@ export function WaveChart({
   const actualWidth = width || containerWidth;
   const actualHeight = height || (actualWidth < 500 ? 220 : 300);
 
-  const padding = actualWidth < 500
+  const padding = useMemo(() => actualWidth < 500
     ? { top: 15, right: 20, bottom: 30, left: 45 }
-    : { top: 20, right: 40, bottom: 40, left: 60 };
+    : { top: 20, right: 40, bottom: 40, left: 60 }, [actualWidth]);
   const chartW = actualWidth - padding.left - padding.right;
   const chartH = actualHeight - padding.top - padding.bottom;
 

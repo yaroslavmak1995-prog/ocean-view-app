@@ -90,9 +90,25 @@ export function LandingPage() {
             Candlesticks Are Obsolete
           </span>
         </h1>
-        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-8">
+        <p className="text-lg md:text-xl text-gray-400 max-w-2xl mx-auto mb-6">
           9 technical indicators fused into a single ocean wave. See market direction in 2 seconds — not 2 minutes.
         </p>
+
+        {/* CTA Buttons */}
+        <div className="flex items-center justify-center gap-4 mb-8">
+          <a
+            href="ocean-wave-demo.html"
+            className="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 rounded-lg text-white font-semibold transition-all shadow-lg shadow-cyan-500/20"
+          >
+            🌊 Try Interactive Demo →
+          </a>
+          <a
+            href="#dashboard"
+            className="px-6 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-200 font-medium transition-all border border-gray-700"
+          >
+            Live Dashboard →
+          </a>
+        </div>
 
         {/* Scenario Buttons */}
         <div className="flex items-center justify-center gap-3 mb-8">

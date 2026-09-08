@@ -16,12 +16,13 @@ interface PulseData {
   zone_color: string;
 }
 
+// Crypto removed — equity-only dashboard for reliability (Day 88 Sprint 2)
 const PULSE_TICKERS = [
-  { symbol: 'BTC-USD', label: 'BTC' },
-  { symbol: 'ETH-USD', label: 'ETH' },
   { symbol: 'AAPL', label: 'AAPL' },
   { symbol: 'NVDA', label: 'NVDA' },
+  { symbol: 'TSLA', label: 'TSLA' },
   { symbol: 'SPY', label: 'SPY' },
+  { symbol: 'GOOGL', label: 'GOOGL' },
 ];
 
 export function useMarketPulse() {
