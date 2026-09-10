@@ -494,7 +494,7 @@ footer a { color: var(--cyan); text-decoration: none; }
     <span class="badge green">Open Source</span>
     <span class="badge">9 Factors</span>
     <span class="badge">11 Alerts</span>
-    <span class="badge">MIT License</span>
+    <span class="badge">MPL 2.0 License</span>
   </div>
 </div>
 
@@ -601,7 +601,7 @@ footer a { color: var(--cyan); text-decoration: none; }
   <div class="feature-card">
     <div class="icon">🔓</div>
     <h3>Open Source</h3>
-    <p>Full Pine Script v6 source code on GitHub. MIT License. No black box.</p>
+    <p>Full Pine Script v6 source code on GitHub. MPL 2.0 License. No black box.</p>
   </div>
 </div>
 
@@ -617,19 +617,23 @@ footer a { color: var(--cyan); text-decoration: none; }
 
 <!-- What's New Changelog -->
 <div class="whats-new" style="max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; border-top: 1px solid var(--border);">
-  <h2 style="text-align: center; color: var(--text-bright); margin-bottom: 1.5rem;">📝 What's New in v3.2</h2>
+  <h2 style="text-align: center; color: var(--text-bright); margin-bottom: 1.5rem;">📝 What's New in v3.3</h2>
   <div style="display: grid; gap: 0.75rem;">
     <div style="display: flex; gap: 0.75rem; align-items: start;">
       <span style="color: var(--green); font-weight: bold;">NEW</span>
-      <span style="color: var(--text-dim);">Auto-Preset Detection — chart timeframe automatically selects Scalping/Swing/Position</span>
+      <span style="color: var(--text-dim);">9-Factor Table RESTORED — each factor with live signal (🟢/🔴/⚪) and value</span>
     </div>
     <div style="display: flex; gap: 0.75rem; align-items: start;">
       <span style="color: var(--green); font-weight: bold;">NEW</span>
-      <span style="color: var(--text-dim);">Dynamic HTF Tint — strength-based transparency (88-95%) for multi-timeframe context</span>
+      <span style="color: var(--text-dim);">Ocean-themed table colors — cyan (bullish), indigo (bearish), slate (neutral)</span>
     </div>
     <div style="display: flex; gap: 0.75rem; align-items: start;">
       <span style="color: var(--green); font-weight: bold;">NEW</span>
-      <span style="color: var(--text-dim);">Combined request.security() calls (4→1 tuple) for 4x performance</span>
+      <span style="color: var(--text-dim);">Configurable table position — Top Right / Bottom Right / Top Left / Bottom Left</span>
+    </div>
+    <div style="display: flex; gap: 0.75rem; align-items: start;">
+      <span style="color: var(--cyan); font-weight: bold;">v3.2</span>
+      <span style="color: var(--text-dim);">Auto-Preset Detection + Dynamic HTF Tint + Combined security calls (4x performance)</span>
     </div>
     <div style="display: flex; gap: 0.75rem; align-items: start;">
       <span style="color: var(--cyan); font-weight: bold;">v3.1</span>
@@ -658,7 +662,7 @@ footer a { color: var(--cyan); text-decoration: none; }
 </div>
 
 <footer>
-  <p>Ocean Wave Trend Visualizer v3.2 · <a href="https://github.com/yaroslavmak1995-prog/ocean-wave-indicator">GitHub</a> · MIT License</p>
+  <p>Ocean Wave Trend Visualizer v3.3 · <a href="https://github.com/yaroslavmak1995-prog/ocean-wave-indicator">GitHub</a> · MPL 2.0 License</p>
   <p style="margin-top: 0.5rem;">Built with ❤️ by <a href="https://github.com/yaroslavmak1995-prog">yaroslavmak1995-prog</a></p>
 </footer>
 
@@ -1201,7 +1205,7 @@ document.getElementById('copyBtn').addEventListener('click', () => {
   }
   // Fallback: fetch from GitHub (requires internet)
   btn.textContent = '⏳ Loading script...';
-  fetch('https://raw.githubusercontent.com/yaroslavmak1995-prog/ocean-wave-indicator/main/pine/ocean-wave-v3.2.pine')
+  fetch('https://raw.githubusercontent.com/yaroslavmak1995-prog/ocean-wave-indicator/main/pine/ocean-wave-v3.3.pine')
     .then(r => r.text())
     .then(text => {
       navigator.clipboard.writeText(text).then(() => {
@@ -1310,7 +1314,7 @@ setInterval(tick, 2000);
 </script>
 
 
-<!-- Pine Script v3.2 embedded for offline copy -->
+<!-- Pine Script v3.3 embedded for offline copy -->
 <script type="text/plain" id="pineScriptEmbedded">// This Pine Script™ source code is subject to the terms of the Mozilla Public License 2.0 at https://mozilla.org/MPL/2.0/
 // © Ocean View
 
@@ -1318,8 +1322,9 @@ setInterval(tick, 2000);
 indicator(&quot;Ocean Wave — Trend Visualizer 🌊&quot;, shorttitle=&quot;Ocean Wave&quot;, overlay=true, max_lines_count=500, max_labels_count=50, max_boxes_count=50)
 
 // ════════════════════════════════════════════════════════════════
-// OCEAN WAVE — Trend Visualizer v3.2
+// OCEAN WAVE — Trend Visualizer v3.3
 // 
+// v3.3: 9-Factor Table RESTORED + ocean-themed + synergy display
 // v3.2: Performance + Auto-Preset + Dynamic HTF Tint
 // v3.1: Multi-Timeframe + Color Transitions + Preset Dropdowns
 // v3.0: Complete repackage as Trend Visualizer (ocean wave metaphor)
@@ -1385,15 +1390,14 @@ htf_timeframe = input.timeframe(&quot;D&quot;, &quot;Higher Timeframe&quot;, gro
 show_mtf_label = input.bool(true, &quot;Show HTF Label&quot;, group=&quot;📊 Multi-Timeframe&quot;)
 show_mtf_bg = input.bool(true, &quot;Show HTF Background Tint&quot;, group=&quot;📊 Multi-Timeframe&quot;)
 
-// Factor Table
-show_factor_table = input.bool(true, &quot;Show 9-Factor Table&quot;, group=&quot;📊 Factor Display&quot;)
-
 // Visualization Settings
 show_wave = input.bool(true, &quot;Show Wave Visualization&quot;, group=&quot;🌊 Wave Display&quot;)
 wave_intensity = input.float(1.5, &quot;Wave Intensity (height multiplier)&quot;, minval=0.5, maxval=3.0, step=0.1, group=&quot;🌊 Wave Display&quot;)
 show_ma_lines = input.bool(false, &quot;Show MA Lines&quot;, group=&quot;🌊 Wave Display&quot;)
 show_label = input.bool(true, &quot;Show Trend Label&quot;, group=&quot;🌊 Wave Display&quot;)
 use_color_transitions = input.bool(true, &quot;Smooth Color Transitions&quot;, group=&quot;🌊 Wave Display&quot;)
+show_factor_table = input.bool(true, &quot;Show 9-Factor Table&quot;, group=&quot;🌊 Wave Display&quot;)
+factor_table_position = input.string(&quot;Top Right&quot;, &quot;Table Position&quot;, options=[&quot;Top Right&quot;, &quot;Bottom Right&quot;, &quot;Top Left&quot;, &quot;Bottom Left&quot;], group=&quot;🌊 Wave Display&quot;)
 
 // Color palette — Ocean theme
 color_bullish_1 = input.color(#06b6d4, &quot;Bullish Wave (Cyan)&quot;, group=&quot;🎨 Colors&quot;)
@@ -1652,11 +1656,14 @@ zone_color_val = base_trend == 1 ? (total_strength &gt;= 70 ? 2 : 1) : base_tren
 
 // ─── MULTI-TIMEFRAME (MTF) ANALYSIS ──────────────────────────────
 // Higher timeframe trend context for intraday traders
-// v3.2: Split request.security() calls — ta.dmi() returns a tuple and can&#x27;t be nested
-htf_ma_fast = request.security(syminfo.tickerid, htf_timeframe, ta.sma(close, ma_fast_len_eff))
-htf_ma_slow = request.security(syminfo.tickerid, htf_timeframe, ta.sma(close, ma_slow_len_eff))
-htf_rsi = request.security(syminfo.tickerid, htf_timeframe, ta.rsi(close, rsi_len_eff))
-[htf_diplus, htf_diminus, htf_adx_val] = request.security(syminfo.tickerid, htf_timeframe, ta.dmi(adx_len_eff, adx_len_eff))
+// v3.2: Combined into single request.security() tuple call for performance
+
+[htf_ma_fast, htf_ma_slow, htf_rsi, htf_diplus, htf_diminus, htf_adx_val] = request.security(syminfo.tickerid, htf_timeframe, [
+  ta.sma(close, ma_fast_len_eff),
+  ta.sma(close, ma_slow_len_eff),
+  ta.rsi(close, rsi_len_eff),
+  ta.dmi(adx_len_eff, adx_len_eff)
+])
 htf_ma_diff = (htf_ma_fast - htf_ma_slow) / htf_ma_slow * 100
 htf_base_trend = htf_ma_diff &gt; 0.5 ? 1 : htf_ma_diff &lt; -0.5 ? -1 : 0
 htf_strength = math.min(100, math.abs(htf_ma_diff) * 15 + 30)
@@ -1855,69 +1862,99 @@ _preset_display = _effective_preset == &quot;Scalping&quot; ? &quot;⚡&quot; : 
 if show_label and barstate.islast
     label.new(bar_index, high + atr_value * 0.5, trend_emoji + &quot; &quot; + trend_text + (_effective_preset != &quot;Default&quot; ? &quot; &quot; + _preset_display : &quot;&quot;), color=color.new(base_trend == 1 ? #06b6d4 : base_trend == -1 ? #6366f1 : #64748b, 50), textcolor=color.white, style=label.style_label_down, size=size.small)
 
-// ─── 9-FACTOR TABLE ────────────────────────────────────────────
-// Shows each of the 9 factors with live status — proof that it&#x27;s really 9-in-1
+// ─── 9-FACTOR TABLE (v3.3 — RESTORED from v2.1, ocean-themed) ────
+// Yaroslav&#x27;s feedback: &quot;9-in-1 має БАЧИТИ 9 факторів, а не лише хвилі&quot;
+// The table shows each factor&#x27;s live signal so users understand WHY the wave looks the way it does
+
+_table_pos = factor_table_position == &quot;Top Right&quot; ? position.top_right : factor_table_position == &quot;Bottom Right&quot; ? position.bottom_right : factor_table_position == &quot;Top Left&quot; ? position.top_left : position.bottom_right
 
 if show_factor_table and barstate.islast
-    // Calculate individual factor statuses
-    _ma_status = base_trend == 1 ? &quot;🟢 Bull&quot; : base_trend == -1 ? &quot;🔴 Bear&quot; : &quot;⚪ Neutral&quot;
-    _vol_status = volume_ratio &gt; 1.5 ? &quot;🟢 High&quot; : volume_ratio &lt; 0.8 ? &quot;🔴 Low&quot; : &quot;⚪ Normal&quot;
-    _rsi_status = rsi_value &gt;= rsi_ob ? &quot;🔴 Overbought&quot; : rsi_value &lt;= rsi_os ? &quot;🟢 Oversold&quot; : rsi_value &gt;= 50 ? &quot;🟢 Bullish&quot; : &quot;🔴 Bearish&quot;
-    _adx_status = adx_value &gt;= 25 ? (adx_direction == &quot;bullish&quot; ? &quot;🟢 Strong Bull&quot; : adx_direction == &quot;bearish&quot; ? &quot;🔴 Strong Bear&quot; : &quot;⚪ Neutral&quot;) : adx_value &gt;= 15 ? &quot;⚪ Weak&quot; : &quot;🔴 No Trend&quot;
-    _macd_status = macd_trend == &quot;strong_bullish&quot; ? &quot;🟢 Strong Bull&quot; : macd_trend == &quot;bullish&quot; ? &quot;🟢 Bull&quot; : macd_trend == &quot;strong_bearish&quot; ? &quot;🔴 Strong Bear&quot; : macd_trend == &quot;bearish&quot; ? &quot;🔴 Bear&quot; : &quot;⚪ Neutral&quot;
-    _atr_status = atr_pct &gt; 5.0 ? &quot;🔴 Very High&quot; : atr_pct &gt; 3.0 ? &quot;🟠 High&quot; : atr_pct &lt; 1.0 ? &quot;🟢 Low&quot; : &quot;⚪ Normal&quot;
-    _bb_status = bb_squeeze == &quot;extreme&quot; ? &quot;🔴 Squeeze&quot; : bb_squeeze == &quot;tight&quot; ? &quot;🟠 Tight&quot; : bb_squeeze == &quot;expanding&quot; ? &quot;🟢 Expanding&quot; : &quot;⚪ Normal&quot;
-    _stoch_status = stoch_signal == &quot;overbought&quot; ? &quot;🔴 Overbought&quot; : stoch_signal == &quot;oversold&quot; ? &quot;🟢 Oversold&quot; : stoch_signal == &quot;bullish&quot; ? &quot;🟢 Bullish&quot; : stoch_signal == &quot;bearish&quot; ? &quot;🔴 Bearish&quot; : &quot;⚪ Neutral&quot;
-    _synergy_status = agree_count &gt;= 5 ? &quot;🟢 Aligned (&quot; + str.tostring(agree_count) + &quot;/6)&quot; : agree_count &gt;= 4 ? &quot;🟢 Aligned (&quot; + str.tostring(agree_count) + &quot;/6)&quot; : &quot;⚪ Partial (&quot; + str.tostring(agree_count) + &quot;/6)&quot;
+    var table factors = table.new(_table_pos, 3, 14, bgcolor=color.new(#0f172a, 15), border_color=color.new(#334155, 60), border_width=1)
     
-    var table factor_tbl = table.new(position.top_right, 3, 11, bgcolor=color.new(#1e293b, 15), border_width=1, border_color=color.new(#475569, 50), frame_color=color.new(#475569, 50), frame_width=1)
+    // Header — ocean themed
+    table.cell(factors, 0, 0, &quot;🌊 Ocean Wave&quot;, text_color=color.new(#06b6d4, 0), text_size=size.normal, bgcolor=color.new(#0f172a, 5))
+    table.merge_cells(factors, 0, 0, 2, 0)
     
-    // Header
-    table.cell(factor_tbl, 0, 0, &quot;🌊 9-Factor Analysis&quot;, text_color=color.white, text_size=size.small, bgcolor=color.new(#0f172a, 10))
-    table.cell(factor_tbl, 1, 0, &quot;Signal&quot;, text_color=color.white, text_size=size.small, bgcolor=color.new(#0f172a, 10))
-    table.cell(factor_tbl, 2, 0, &quot;Strength&quot;, text_color=color.white, text_size=size.small, bgcolor=color.new(#0f172a, 10))
+    // Summary row — Trend
+    _trend_emoji_t = base_trend == 1 ? &quot;🌊&quot; : base_trend == -1 ? &quot;🌀&quot; : &quot;~&quot;
+    _trend_text_t = base_trend == 1 ? (total_strength &gt;= 70 ? &quot;Rising Tide&quot; : &quot;Flowing Up&quot;) : base_trend == -1 ? (total_strength &gt;= 70 ? &quot;Undertow&quot; : &quot;Falling&quot;) : &quot;Calm Waters&quot;
+    table.cell(factors, 0, 1, _trend_emoji_t + &quot; Trend&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.small)
+    table.merge_cells(factors, 0, 1, 1, 1)
+    table.cell(factors, 2, 1, _trend_text_t, text_color=base_trend == 1 ? color.new(#06b6d4, 0) : base_trend == -1 ? color.new(#6366f1, 0) : color.new(#64748b, 0), text_size=size.small)
     
-    // 9 factors
-    table.cell(factor_tbl, 0, 1, &quot;1. MA Crossover (&quot; + str.tostring(ma_fast_len_eff) + &quot;/&quot; + str.tostring(ma_slow_len_eff) + &quot;)&quot;, text_color=#cbd5e1, text_size=size.tiny)
-    table.cell(factor_tbl, 1, 1, _ma_status, text_color=#e2e8f0, text_size=size.tiny)
-    table.cell(factor_tbl, 2, 1, str.tostring(math.round(math.abs(ma_diff_pct) * 15)), text_color=#e2e8f0, text_size=size.tiny)
+    // Summary row — Strength
+    table.cell(factors, 0, 2, &quot;💪 Strength&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.small)
+    table.merge_cells(factors, 0, 2, 1, 2)
+    table.cell(factors, 2, 2, str.tostring(total_strength, &quot;#&quot;) + &quot;%&quot;, text_color=total_strength &gt;= 70 ? color.new(#06b6d4, 0) : total_strength &gt;= 40 ? color.new(#fbbf24, 0) : color.new(#ef4444, 0), text_size=size.small)
     
-    table.cell(factor_tbl, 0, 2, &quot;2. Volume (vs 20-avg)&quot;, text_color=#cbd5e1, text_size=size.tiny)
-    table.cell(factor_tbl, 1, 2, _vol_status, text_color=#e2e8f0, text_size=size.tiny)
-    table.cell(factor_tbl, 2, 2, str.tostring(math.round(volume_ratio * 100)) + &quot;%&quot;, text_color=#e2e8f0, text_size=size.tiny)
+    // Summary row — Confidence
+    table.cell(factors, 0, 3, &quot;🎯 Confidence&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.small)
+    table.merge_cells(factors, 0, 3, 1, 3)
+    table.cell(factors, 2, 3, str.tostring(confidence, &quot;#&quot;) + &quot;%&quot;, text_color=confidence &gt;= 50 ? color.new(#06b6d4, 0) : confidence &gt;= 25 ? color.new(#fbbf24, 0) : color.new(#ef4444, 0), text_size=size.small)
     
-    table.cell(factor_tbl, 0, 3, &quot;3. RSI (&quot; + str.tostring(rsi_len_eff) + &quot;)&quot;, text_color=#cbd5e1, text_size=size.tiny)
-    table.cell(factor_tbl, 1, 3, _rsi_status, text_color=#e2e8f0, text_size=size.tiny)
-    table.cell(factor_tbl, 2, 3, str.tostring(math.round(rsi_value)), text_color=#e2e8f0, text_size=size.tiny)
+    // Separator
+    table.cell(factors, 0, 4, &quot;── 9 Factors ──&quot;, text_color=color.new(#475569, 0), text_size=size.tiny)
+    table.merge_cells(factors, 0, 4, 2, 4)
     
-    table.cell(factor_tbl, 0, 4, &quot;4. ADX (&quot; + str.tostring(adx_len_eff) + &quot;)&quot;, text_color=#cbd5e1, text_size=size.tiny)
-    table.cell(factor_tbl, 1, 4, _adx_status, text_color=#e2e8f0, text_size=size.tiny)
-    table.cell(factor_tbl, 2, 4, str.tostring(math.round(adx_value)), text_color=#e2e8f0, text_size=size.tiny)
+    // Factor 1: MA Crossover
+    _ma_signal = ma_diff_pct &gt; 0.5 ? &quot;Bullish&quot; : ma_diff_pct &lt; -0.5 ? &quot;Bearish&quot; : &quot;Neutral&quot;
+    _ma_icon = ma_diff_pct &gt; 0.5 ? &quot;🟢&quot; : ma_diff_pct &lt; -0.5 ? &quot;🔴&quot; : &quot;⚪&quot;
+    table.cell(factors, 0, 5, _ma_icon, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 1, 5, &quot;MA&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 2, 5, _ma_signal + &quot; (&quot; + str.tostring(ma_diff_pct, &quot;#.##&quot;) + &quot;%)&quot;, text_color=ma_diff_pct &gt; 0.5 ? color.new(#06b6d4, 0) : ma_diff_pct &lt; -0.5 ? color.new(#6366f1, 0) : color.new(#64748b, 0), text_size=size.tiny)
     
-    table.cell(factor_tbl, 0, 5, &quot;5. MACD (&quot; + str.tostring(macd_fast) + &quot;/&quot; + str.tostring(macd_slow) + &quot;)&quot;, text_color=#cbd5e1, text_size=size.tiny)
-    table.cell(factor_tbl, 1, 5, _macd_status, text_color=#e2e8f0, text_size=size.tiny)
-    table.cell(factor_tbl, 2, 5, str.tostring(math.round(macd_hist * 100) / 100), text_color=#e2e8f0, text_size=size.tiny)
+    // Factor 2: Volume
+    _vol_signal = volume_ratio &gt; 1.5 ? &quot;High&quot; : volume_ratio &gt; 1.2 ? &quot;Normal&quot; : volume_ratio &lt; 0.8 ? &quot;Low&quot; : &quot;Weak&quot;
+    _vol_icon = volume_ratio &gt; 1.5 ? &quot;🟢&quot; : volume_ratio &lt; 0.8 ? &quot;🔴&quot; : &quot;⚪&quot;
+    table.cell(factors, 0, 6, _vol_icon, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 1, 6, &quot;Volume&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 2, 6, _vol_signal + &quot; (&quot; + str.tostring(volume_ratio, &quot;#.##&quot;) + &quot;x)&quot;, text_color=volume_ratio &gt; 1.5 ? color.new(#06b6d4, 0) : volume_ratio &lt; 0.8 ? color.new(#6366f1, 0) : color.new(#64748b, 0), text_size=size.tiny)
     
-    table.cell(factor_tbl, 0, 6, &quot;6. ATR Volatility&quot;, text_color=#cbd5e1, text_size=size.tiny)
-    table.cell(factor_tbl, 1, 6, _atr_status, text_color=#e2e8f0, text_size=size.tiny)
-    table.cell(factor_tbl, 2, 6, str.tostring(math.round(atr_pct * 100) / 100) + &quot;%&quot;, text_color=#e2e8f0, text_size=size.tiny)
+    // Factor 3: RSI
+    _rsi_label = rsi_value &gt;= 70 ? &quot;OB&quot; : rsi_value &lt;= 30 ? &quot;OS&quot; : &quot;Neutral&quot;
+    _rsi_icon = rsi_value &gt;= 70 ? &quot;🔴&quot; : rsi_value &lt;= 30 ? &quot;🟢&quot; : &quot;⚪&quot;
+    table.cell(factors, 0, 7, _rsi_icon, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 1, 7, &quot;RSI&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 2, 7, str.tostring(rsi_value, &quot;#.#&quot;) + &quot; &quot; + _rsi_label, text_color=rsi_value &gt;= 70 ? color.new(#ef4444, 0) : rsi_value &lt;= 30 ? color.new(#06b6d4, 0) : color.new(#64748b, 0), text_size=size.tiny)
     
-    table.cell(factor_tbl, 0, 7, &quot;7. Bollinger Bands&quot;, text_color=#cbd5e1, text_size=size.tiny)
-    table.cell(factor_tbl, 1, 7, _bb_status, text_color=#e2e8f0, text_size=size.tiny)
-    table.cell(factor_tbl, 2, 7, str.tostring(math.round(bb_bandwidth * 100) / 100) + &quot;%&quot;, text_color=#e2e8f0, text_size=size.tiny)
+    // Factor 4: ADX
+    _adx_label = adx_value &gt;= 25 ? &quot;Strong&quot; : adx_value &gt;= 15 ? &quot;Moderate&quot; : &quot;Weak&quot;
+    _adx_icon = adx_value &gt;= 25 ? &quot;🟢&quot; : adx_value &gt;= 15 ? &quot;⚪&quot; : &quot;🔴&quot;
+    table.cell(factors, 0, 8, _adx_icon, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 1, 8, &quot;ADX&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 2, 8, str.tostring(adx_value, &quot;#.#&quot;) + &quot; &quot; + _adx_label + &quot; &quot; + adx_direction, text_color=adx_value &gt;= 25 ? color.new(#06b6d4, 0) : adx_value &gt;= 15 ? color.new(#fbbf24, 0) : color.new(#ef4444, 0), text_size=size.tiny)
     
-    table.cell(factor_tbl, 0, 8, &quot;8. Stochastic&quot;, text_color=#cbd5e1, text_size=size.tiny)
-    table.cell(factor_tbl, 1, 8, _stoch_status, text_color=#e2e8f0, text_size=size.tiny)
-    table.cell(factor_tbl, 2, 8, str.tostring(math.round(stoch_k)) + &quot;/100&quot;, text_color=#e2e8f0, text_size=size.tiny)
+    // Factor 5: MACD
+    _macd_icon = macd_trend == &quot;strong_bullish&quot; ? &quot;🟢&quot; : macd_trend == &quot;bullish&quot; ? &quot;🟢&quot; : macd_trend == &quot;strong_bearish&quot; ? &quot;🔴&quot; : macd_trend == &quot;bearish&quot; ? &quot;🔴&quot; : &quot;⚪&quot;
+    table.cell(factors, 0, 9, _macd_icon, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 1, 9, &quot;MACD&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 2, 9, macd_trend, text_color=macd_trend == &quot;strong_bullish&quot; ? color.new(#06b6d4, 0) : macd_trend == &quot;bullish&quot; ? color.new(#0891b2, 0) : macd_trend == &quot;strong_bearish&quot; ? color.new(#6366f1, 0) : macd_trend == &quot;bearish&quot; ? color.new(#3730a3, 0) : color.new(#64748b, 0), text_size=size.tiny)
     
-    table.cell(factor_tbl, 0, 9, &quot;9. Synergy Bonus&quot;, text_color=#cbd5e1, text_size=size.tiny)
-    table.cell(factor_tbl, 1, 9, _synergy_status, text_color=#e2e8f0, text_size=size.tiny)
-    table.cell(factor_tbl, 2, 9, &quot;+&quot; + str.tostring(synergy_bonus), text_color=#e2e8f0, text_size=size.tiny)
+    // Factor 6: ATR
+    _atr_label = atr_pct &gt; 5.0 ? &quot;Extreme&quot; : atr_pct &gt; 3.0 ? &quot;High&quot; : atr_pct &lt; 1.0 ? &quot;Low&quot; : &quot;Normal&quot;
+    _atr_icon = atr_pct &gt; 3.0 ? &quot;🔴&quot; : atr_pct &lt; 1.0 ? &quot;🟢&quot; : &quot;⚪&quot;
+    table.cell(factors, 0, 10, _atr_icon, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 1, 10, &quot;ATR&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 2, 10, _atr_label + &quot; (&quot; + str.tostring(atr_pct, &quot;#.##&quot;) + &quot;%)&quot;, text_color=atr_pct &gt; 3.0 ? color.new(#ef4444, 0) : atr_pct &lt; 1.0 ? color.new(#06b6d4, 0) : color.new(#64748b, 0), text_size=size.tiny)
     
-    // Summary row
-    table.cell(factor_tbl, 0, 10, &quot;📋 TOTAL&quot;, text_color=color.white, text_size=size.tiny, bgcolor=color.new(#0f172a, 20))
-    table.cell(factor_tbl, 1, 10, base_trend == 1 ? &quot;🟢 BULLISH&quot; : base_trend == -1 ? &quot;🔴 BEARISH&quot; : &quot;⚪ NEUTRAL&quot;, text_color=color.white, text_size=size.tiny, bgcolor=color.new(#0f172a, 20))
-    table.cell(factor_tbl, 2, 10, str.tostring(math.round(total_strength)) + &quot;%&quot;, text_color=color.white, text_size=size.tiny, bgcolor=color.new(#0f172a, 20))
+    // Factor 7: Bollinger Bands
+    _bb_icon = bb_squeeze == &quot;extreme&quot; or bb_squeeze == &quot;tight&quot; ? &quot;🟡&quot; : bb_squeeze == &quot;expanding&quot; ? &quot;🟢&quot; : &quot;⚪&quot;
+    table.cell(factors, 0, 11, _bb_icon, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 1, 11, &quot;BB&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 2, 11, str.tostring(bb_percent_b, &quot;#.##&quot;) + &quot; &quot; + bb_squeeze, text_color=bb_squeeze == &quot;extreme&quot; or bb_squeeze == &quot;tight&quot; ? color.new(#fbbf24, 0) : bb_squeeze == &quot;expanding&quot; ? color.new(#06b6d4, 0) : color.new(#64748b, 0), text_size=size.tiny)
+    
+    // Factor 8: Stochastic
+    _stoch_icon = stoch_signal == &quot;overbought&quot; ? &quot;🔴&quot; : stoch_signal == &quot;oversold&quot; ? &quot;🟢&quot; : &quot;⚪&quot;
+    table.cell(factors, 0, 12, _stoch_icon, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 1, 12, &quot;Stoch&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 2, 12, str.tostring(stoch_k, &quot;#.#&quot;) + &quot;/&quot; + str.tostring(stoch_d, &quot;#.#&quot;) + &quot; &quot; + stoch_signal, text_color=stoch_signal == &quot;overbought&quot; ? color.new(#ef4444, 0) : stoch_signal == &quot;oversold&quot; ? color.new(#06b6d4, 0) : color.new(#64748b, 0), text_size=size.tiny)
+    
+    // Factor 9: Synergy
+    _syn_icon = agree_count &gt;= 4 ? &quot;🟢&quot; : &quot;⚪&quot;
+    _syn_text = str.tostring(agree_count, &quot;#&quot;) + &quot;/6 agree&quot;
+    table.cell(factors, 0, 13, _syn_icon, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 1, 13, &quot;Synergy&quot;, text_color=color.new(#e2e8f0, 0), text_size=size.tiny)
+    table.cell(factors, 2, 13, _syn_text, text_color=agree_count &gt;= 4 ? color.new(#06b6d4, 0) : color.new(#64748b, 0), text_size=size.tiny)
 
 // ─── ZONE CHANGE TRACKING ───────────────────────────────────────
 
